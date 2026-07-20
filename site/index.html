@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ヤミバレ 🔦 届いたら、貼るだけ。</title>
+<meta name="description" content="怪しいDM・バイト募集・儲け話を貼るだけで、オープンデータを根拠に危険度をチェック。闇バイト・特殊詐欺から若者を守る。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1020; --panel:#161b30; --panel2:#1e2440;
+  --bot:#232a4a; --user:#06c755; --txt:#eef1ff; --sub:#9aa3c7;
+  --yaba:#ff4d5e; --warn:#ffb020; --care:#ffd54d; --safe:#4dc9ff;
+  --line:#2a3155; --accent:#ffd54d;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Noto Sans JP',sans-serif;background:#070912;color:var(--txt);
+  display:flex;justify-content:center;
+}
+#app{width:100%;max-width:520px;height:100dvh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+/* ---- header ---- */
+header{
+  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;
+  background:linear-gradient(135deg,#12172e 0%,#1a1f3d 100%);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:10px;z-index:5;
+}
+.logo{font-family:'Zen Maru Gothic';font-weight:900;font-size:20px;letter-spacing:1px;
+  background:linear-gradient(90deg,#ffd54d,#ff8a5c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.logo .torch{-webkit-text-fill-color:initial;font-size:18px}
+.tagline{font-size:10.5px;color:var(--sub);margin-top:1px}
+.hbtns{margin-left:auto;display:flex;gap:6px}
+.hbtn{border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:14px;
+  padding:6px 10px;font-size:11.5px;font-family:inherit;cursor:pointer}
+/* ---- chat ---- */
+#chat{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.row{display:flex;gap:8px;align-items:flex-end;animation:pop .25s ease}
+@keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.row.user{flex-direction:row-reverse}
+.avatar{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#2a325c,#161b30);
+  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid var(--line)}
+.bubble{max-width:82%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.75;word-break:break-word;white-space:pre-wrap}
+.row.bot .bubble{background:var(--bot);border-bottom-left-radius:4px}
+.row.user .bubble{background:var(--user);color:#04240f;font-weight:500;border-bottom-right-radius:4px}
+.bname{font-size:10px;color:var(--sub);margin-bottom:3px}
+/* result cards inside bot bubble */
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:8px}
+.card:first-child{margin-top:0}
+.lvl-emoji{font-size:30px}
+.lvl-name{font-family:'Zen Maru Gothic';font-weight:900;font-size:21px;margin:2px 0 4px}
+.lvl-3 .lvl-name{color:var(--yaba)} .lvl-2 .lvl-name{color:var(--warn)}
+.lvl-1 .lvl-name{color:var(--care)} .lvl-0 .lvl-name{color:var(--safe)}
+.meter{height:10px;background:#0b0e1c;border-radius:6px;overflow:hidden;margin:8px 0 4px}
+.meter i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#4dc9ff,#ffd54d,#ffb020,#ff4d5e);transition:width 1s ease}
+.score-note{font-size:11px;color:var(--sub)}
+.cat-chip{display:inline-block;background:#0b0e1c;border:1px solid var(--line);border-radius:12px;
+  padding:3px 10px;font-size:12px;margin:6px 4px 0 0}
+.flag{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;margin-top:7px}
+.flag b{color:var(--accent);font-weight:700}
+.flag .fx{flex-shrink:0}
+.stat{border-left:3px solid var(--accent);padding-left:10px;margin-top:8px;font-size:12.5px}
+.stat .num{font-family:'Zen Maru Gothic';font-weight:900;font-size:19px;color:var(--accent)}
+.src{font-size:10px;color:var(--sub);margin-top:6px}
+.alert-card{background:linear-gradient(135deg,#3a1220,#2a0e18);border:1px solid #ff4d5e;border-radius:14px;padding:13px;margin-top:8px}
+.alert-card h3{font-family:'Zen Maru Gothic';color:#ff8a94;font-size:15px;margin-bottom:6px}
+.alert-card p{font-size:12.5px;line-height:1.75}
+.btnrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.abtn{border:none;border-radius:14px;padding:9px 13px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
+.abtn.primary{background:var(--accent);color:#1a1400}
+.abtn.danger{background:var(--yaba);color:#fff}
+.abtn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+/* typing */
+.dots{display:inline-flex;gap:4px;padding:4px 2px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:bl 1s infinite}
+.dots i:nth-child(2){animation-delay:.18s}.dots i:nth-child(3){animation-delay:.36s}
+@keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+/* ---- samples + input ---- */
+#samples{display:flex;gap:7px;overflow-x:auto;padding:8px 12px;scrollbar-width:none}
+#samples::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;border:1px solid var(--line);background:var(--panel);color:var(--txt);
+  border-radius:16px;padding:8px 13px;font-size:12px;font-family:inherit;cursor:pointer}
+#inputbar{display:flex;gap:8px;padding:8px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:var(--panel);border-top:1px solid var(--line);align-items:flex-end}
+#msg{flex:1;background:#0b0e1c;border:1px solid var(--line);border-radius:16px;color:var(--txt);
+  font-family:inherit;font-size:13.5px;line-height:1.6;padding:10px 13px;resize:none;max-height:110px;outline:none}
+#msg::placeholder{color:#5a6390}
+#send{width:44px;height:44px;border-radius:50%;border:none;background:var(--user);color:#fff;
+  font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+#send:disabled{opacity:.4}
+/* ---- sheet ---- */
+.sheet-wrap{position:absolute;inset:0;background:rgba(4,6,15,.65);backdrop-filter:blur(2px);
+  display:none;align-items:flex-end;z-index:20}
+.sheet-wrap.on{display:flex}
+.sheet{width:100%;background:var(--panel);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);
+  max-height:78%;overflow-y:auto;animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet h2{font-family:'Zen Maru Gothic';font-size:16px;margin-bottom:4px}
+.sheet .note{font-size:11px;color:var(--sub);margin-bottom:12px}
+.contact{display:flex;align-items:center;gap:11px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:14px;padding:12px;margin-bottom:9px;text-decoration:none;color:var(--txt)}
+.contact .ic{font-size:22px}
+.contact .t1{font-size:13.5px;font-weight:700}
+.contact .t2{font-size:11px;color:var(--sub);margin-top:2px}
+.contact .tel{margin-left:auto;font-family:'Zen Maru Gothic';font-weight:900;color:var(--accent);font-size:15px;flex-shrink:0}
+.srcitem{font-size:11.5px;line-height:1.7;color:var(--sub);margin-bottom:9px;padding-left:10px;border-left:2px solid var(--line)}
+.srcitem b{color:var(--txt)}
+select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--line);border-radius:12px;
+  padding:11px;font-family:inherit;font-size:14px;margin-bottom:10px}
+.close-x{margin-left:auto;background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer}
+.sheet-head{display:flex;align-items:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div>
+      <div class="logo"><span class="torch">🔦</span> ヤミバレ</div>
+      <div class="tagline">届いたら、貼るだけ。闇バイト・詐欺チェッカー</div>
+    </div>
+    <div class="hbtns">
+      <button class="hbtn" onclick="openSheet('machi')">📍わがまち</button>
+      <button class="hbtn" onclick="openSheet('sos')">🆘相談先</button>
+    </div>
+  </header>
+
+  <div id="chat"></div>
+
+  <div id="samples"></div>
+  <div id="inputbar">
+    <textarea id="msg" rows="1" placeholder="怪しいDM・求人・儲け話をここに貼る"></textarea>
+    <button id="send" onclick="submitMsg()">🔦</button>
+  </div>
+
+  <!-- 相談先シート -->
+  <div class="sheet-wrap" id="sheet-sos" onclick="if(event.target===this)closeSheets()">
+    <div class="sheet">
+      <div class="sheet-head"><h2>🆘 相談先(ぜんぶ無料)</h2><button class="close-x" onclick="closeSheets()">✕</button></div>
+      <div class="note">「大ごとにしたくない」と思っても大丈夫。相談しただけで怒られることはありません。</div>
+      <a class="contact" href="tel:110"><span class="ic">🚨</span><span><span class="t1">いま危険が迫っている</span><div class="t2">事件・緊急</div></span><span class="tel">110</span></a>
+      <a class="contact" href="tel:%239110"><span class="ic">👮</span><span><span class="t1">警察相談専用電話</span><div class="t2">詐欺かも?闇バイトに応募したかも…全部OK</div></span><span class="tel">#9110</span></a>
+      <a class="contact" href="tel:0335804970"><span class="ic">🧑‍🎓</span><span><span class="t1">ヤング・テレホン・コーナー</span><div class="t2">警視庁の少年相談窓口(本人・家族OK)</div></span><span class="tel">03-3580-4970</span></a>
+      <a class="contact" href="tel:188"><span class="ic">🛒</span><span><span class="t1">消費者ホットライン</span><div class="t2">買い物・投資・サブスクのトラブル</div></span><span class="tel">188</span></a>
+      <div class="note" style="margin-top:8px">※ヤミバレは公的機関のサービスではありません。判定は目安です。迷ったら必ず相談を。</div>
+      <button class="abtn ghost" style="width:100%" onclick="openSheet('src')">📚 データの出典を見る</button>
+    </div>
+  </div>
+
+  <!-- わがまちシート -->
+  <div class="sheet-wrap" id="sheet-machi" onclick="if(event.target===this)closeSheets()">
+    <div class="sheet">
+      <div class="sheet-head"><h2>📍 わがまちの詐欺データ</h2><button class="close-x" onclick="closeSheets()">✕</button></div>
+      <div class="note">警視庁オープンデータ(令和7年・区市町村の町丁別/手口別認知件数)から、あなたの街の「詐欺」認知件数を表示します。</div>
+      <select id="machi-select"><option value="">区市町村を選ぶ</option></select>
+      <button class="abtn primary" style="width:100%" onclick="showMachi()">この街のデータを見る</button>
+    </div>
+  </div>
+
+  <!-- 出典シート -->
+  <div class="sheet-wrap" id="sheet-src" onclick="if(event.target===this)closeSheets()">
+    <div class="sheet">
+      <div class="sheet-head"><h2>📚 データの出典</h2><button class="close-x" onclick="closeSheets()">✕</button></div>
+      <div class="note">ヤミバレの判定根拠は、すべて公的機関の公開データです。</div>
+      <div class="srcitem"><b>警視庁</b>「区市町村の町丁別、手口別認知件数(令和7年)」CSV — 都内59区市町村の刑法犯「詐欺」認知件数(都内計10,521件)を集計して内蔵</div>
+      <div class="srcitem"><b>警察庁</b>「令和7年における特殊詐欺及びSNS型投資・ロマンス詐欺の認知・検挙状況等について」 — 特殊詐欺 認知27,758件・被害額約1,414億円/ニセ警察詐欺 11,014件・約1,005億円(30代最多2,239件・20代1,718件)/SNS型投資詐欺 9,538件・約1,275億円/SNS型ロマンス詐欺 5,604件・約552億円</div>
+      <div class="srcitem"><b>警察庁</b> 闇バイト応募者の保護措置 544件(2026年1月発表・約1年間) — 20代45.2%・10代24.8%・30代13.6%と、10〜30代が8割超</div>
+      <div class="srcitem"><b>警察庁</b>「犯罪実行者募集の実態」 — 特殊詐欺実行役の約半数がSNSの「闇バイト」応募がきっかけ</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 警視庁オープンデータ(令和7年・集計済み) ================= */
+const WAGAMACHI=[
+  {n:"千代田区",s:470,la:35.694,lo:139.754,t:[["丸の内１丁目",78],["外神田１丁目",23],["霞が関１丁目",21]]},
+  {n:"中央区",s:312,la:35.671,lo:139.772,t:[["八重洲１丁目",43],["新川１丁目",22],["銀座８丁目",16]]},
+  {n:"港区",s:518,la:35.658,lo:139.752,t:[["南青山３丁目",24],["赤坂９丁目",20],["新橋２丁目",19]]},
+  {n:"新宿区",s:688,la:35.694,lo:139.703,t:[["西新宿２丁目",57],["歌舞伎町１丁目",55],["新宿３丁目",53]]},
+  {n:"文京区",s:299,la:35.708,lo:139.752,t:[["後楽１丁目",41],["大塚３丁目",12],["白山４丁目",11]]},
+  {n:"台東区",s:213,la:35.713,lo:139.78,t:[["上野６丁目",10],["浅草１丁目",8],["上野４丁目",8]]},
+  {n:"墨田区",s:192,la:35.71,lo:139.802,t:[["押上１丁目",12],["江東橋３丁目",12],["東向島４丁目",6]]},
+  {n:"江東区",s:350,la:35.673,lo:139.817,t:[["東雲１丁目",16],["亀戸６丁目",14],["辰巳１丁目",14]]},
+  {n:"品川区",s:272,la:35.609,lo:139.73,t:[["八潮５丁目",12],["北品川５丁目",11],["大井１丁目",9]]},
+  {n:"目黒区",s:189,la:35.641,lo:139.698,t:[["上目黒３丁目",9],["青葉台３丁目",7],["青葉台４丁目",7]]},
+  {n:"大田区",s:406,la:35.561,lo:139.716,t:[["蒲田４丁目",13],["西蒲田７丁目",12],["蒲田５丁目",10]]},
+  {n:"世田谷区",s:480,la:35.646,lo:139.653,t:[["池尻２丁目",7],["経堂５丁目",7],["玉川１丁目",7]]},
+  {n:"渋谷区",s:426,la:35.664,lo:139.698,t:[["道玄坂１丁目",25],["宇田川町",24],["道玄坂２丁目",22]]},
+  {n:"中野区",s:211,la:35.707,lo:139.664,t:[["中野５丁目",18],["中央２丁目",9],["東中野４丁目",9]]},
+  {n:"杉並区",s:284,la:35.7,lo:139.636,t:[["高円寺南３丁目",10],["阿佐谷南１丁目",9],["成田東１丁目",9]]},
+  {n:"豊島区",s:426,la:35.726,lo:139.717,t:[["西池袋１丁目",34],["東池袋１丁目",32],["東池袋３丁目",32]]},
+  {n:"北区",s:335,la:35.753,lo:139.734,t:[["神谷３丁目",34],["赤羽１丁目",15],["豊島５丁目",11]]},
+  {n:"荒川区",s:165,la:35.736,lo:139.783,t:[["西日暮里２丁目",15],["東日暮里６丁目",9],["荒川１丁目",8]]},
+  {n:"板橋区",s:331,la:35.751,lo:139.709,t:[["高島平２丁目",12],["赤塚２丁目",8],["大山町",8]]},
+  {n:"練馬区",s:413,la:35.736,lo:139.652,t:[["小竹町１丁目",9],["桜台３丁目",9],["栄町",8]]},
+  {n:"足立区",s:376,la:35.775,lo:139.804,t:[["千住２丁目",12],["扇１丁目",8],["千住曙町",8]]},
+  {n:"葛飾区",s:287,la:35.744,lo:139.847,t:[["新小岩１丁目",12],["亀有５丁目",11],["青戸３丁目",9]]},
+  {n:"江戸川区",s:318,la:35.707,lo:139.868,t:[["西葛西６丁目",9],["東葛西６丁目",8],["西葛西３丁目",7]]},
+  {n:"八王子市",s:253,la:35.666,lo:139.316,t:[["元横山町２丁目",11],["旭町",10],["打越町",8]]},
+  {n:"立川市",s:166,la:35.698,lo:139.408,t:[["曙町２丁目",21],["柴崎町３丁目",7],["錦町１丁目",6]]},
+  {n:"武蔵野市",s:159,la:35.718,lo:139.566,t:[["吉祥寺本町１丁目",12],["吉祥寺東町２丁目",11],["中町３丁目",10]]},
+  {n:"三鷹市",s:124,la:35.683,lo:139.56,t:[["下連雀３丁目",10],["上連雀９丁目",7],["下連雀２丁目",6]]},
+  {n:"青梅市",s:59,la:35.788,lo:139.276,t:[["河辺町１丁目",4],["河辺町７丁目",3],["新町９丁目",3]]},
+  {n:"府中市",s:116,la:35.669,lo:139.478,t:[["白糸台１丁目",5],["紅葉丘３丁目",4],["若松町１丁目",4]]},
+  {n:"昭島市",s:30,la:35.706,lo:139.353,t:[["宮沢町",3],["郷地町３丁目",2],["昭和町１丁目",2]]},
+  {n:"調布市",s:128,la:35.651,lo:139.541,t:[["仙川町１丁目",8],["染地３丁目",6],["国領町７丁目",5]]},
+  {n:"町田市",s:283,la:35.546,lo:139.439,t:[["相原町",14],["山崎町",14],["本町田",12]]},
+  {n:"小金井市",s:30,la:35.699,lo:139.503,t:[["貫井南町１丁目",4],["東町４丁目",3],["梶野町５丁目",2]]},
+  {n:"小平市",s:114,la:35.728,lo:139.478,t:[["仲町",8],["花小金井１丁目",7],["大沼町４丁目",6]]},
+  {n:"日野市",s:181,la:35.671,lo:139.395,t:[["大字日野",12],["三沢",8],["百草",8]]},
+  {n:"東村山市",s:111,la:35.755,lo:139.468,t:[["恩多町２丁目",7],["本町４丁目",6],["青葉町２丁目",5]]},
+  {n:"国分寺市",s:31,la:35.702,lo:139.462,t:[["東元町２丁目",3],["内藤１丁目",2],["西町１丁目",2]]},
+  {n:"国立市",s:56,la:35.684,lo:139.442,t:[["富士見台３丁目",7],["谷保",7],["富士見台１丁目",5]]},
+  {n:"福生市",s:33,la:35.738,lo:139.327,t:[["大字熊川",12],["大字福生",6],["南田園１丁目",3]]},
+  {n:"狛江市",s:51,la:35.635,lo:139.579,t:[["西野川４丁目",6],["和泉本町１丁目",4],["東野川１丁目",4]]},
+  {n:"東大和市",s:49,la:35.745,lo:139.427,t:[["桜が丘１丁目",6],["清原３丁目",2],["湖畔１丁目",2]]},
+  {n:"清瀬市",s:59,la:35.786,lo:139.526,t:[["竹丘１丁目",4],["竹丘３丁目",4],["野塩１丁目",4]]},
+  {n:"東久留米市",s:64,la:35.758,lo:139.53,t:[["上の原２丁目",4],["上の原１丁目",3],["金山町２丁目",3]]},
+  {n:"武蔵村山市",s:39,la:35.755,lo:139.387,t:[["本町２丁目",4],["中央２丁目",3],["緑が丘",3]]},
+  {n:"多摩市",s:130,la:35.637,lo:139.446,t:[["山王下１丁目",13],["落合１丁目",10],["和田",9]]},
+  {n:"稲城市",s:63,la:35.638,lo:139.505,t:[["東長沼",11],["矢野口",7],["大丸",6]]},
+  {n:"羽村市",s:41,la:35.767,lo:139.311,t:[["栄町１丁目",5],["神明台１丁目",5],["神明台２丁目",5]]},
+  {n:"あきる野市",s:49,la:35.729,lo:139.294,t:[["伊奈",6],["五日市",4],["草花",4]]},
+  {n:"西東京市",s:105,la:35.726,lo:139.538,t:[["田無町４丁目",5],["東町３丁目",5],["芝久保町１丁目",4]]},
+  {n:"瑞穂町",s:21,la:35.772,lo:139.354,t:[["むさし野２丁目",4],["大字二本木",3],["大字箱根ケ崎",3]]},
+  {n:"日の出町",s:4,la:35.742,lo:139.256,t:[["大字平井",3],["大字大久野",1]]},
+  {n:"檜原村",s:1,la:35.727,lo:139.149,t:[]},
+  {n:"奥多摩町",s:2,la:35.809,lo:139.096,t:[["氷川",2]]},
+  {n:"大島町",s:2,la:34.75,lo:139.356,t:[["岡田字新開",1],["元町字水溜",1]]},
+  {n:"新島村",s:1,la:34.378,lo:139.259,t:[["式根島",1]]},
+  {n:"神津島村",s:0,la:34.207,lo:139.134,t:[]},
+  {n:"三宅村",s:0,la:34.075,lo:139.529,t:[]},
+  {n:"八丈町",s:0,la:33.109,lo:139.79,t:[]},
+  {n:"小笠原村",s:5,la:27.094,lo:142.192,t:[["父島字奥村",3],["母島字元地",2]]}
+];
+
+/* ================= 判定エンジン ================= */
+const CATS = {
+  yamibaito: { name:'闇バイト', icon:'🕳️', pat:[
+    [/日給\s*[3-9１-９~〜]+\s*万|[3-9１-９]\s*万円?\s*(即日|保証)/,15,'高すぎる日給'],
+    [/(即日|即金|当日)\s*(払い|現金|支払)|現金\s*手渡し|手渡し/,10,'即金・手渡し強調'],
+    [/(運ぶ|受け取る|預かる|回収する?|受け渡す)\s*だけ/,15,'「〜するだけ」の簡単アピール'],
+    [/ホワイト案件|グレー案件|裏バイト|闇バイト|高額案件/,20,'「案件」系の怪しい呼び方'],
+    [/身分証|免許証|マイナンバー|学生証|保険証/,12,'身分証の提出要求(脅しの材料にされる)'],
+    [/テレグラム|Telegram|シグナル|Signal|消えるメッセージ|バニッシュ/i,15,'秘匿アプリへの誘導'],
+    [/(簡単|誰でも|スキマ時間)\s*で?\s*稼げる|高収入|高額報酬/,8,'うますぎる稼ぎ話'],
+    [/叩き|タタキ|受け子|出し子|かけ子|UD|飛ばし携帯/,20,'犯罪の隠語'],
+    [/年齢不問|即採用|ノルマなし|面接なし/,5,'ハードルの低さ強調'],
+  ]},
+  police: { name:'ニセ警察・検察', icon:'👮', pat:[
+    [/警視庁|警察庁|警察署|検察|検事|刑事|巡査|サイバー(犯罪)?対策/,8,'警察・検察を名乗る'],
+    [/逮捕状|逮捕|勾留|出頭/,12,'逮捕をちらつかせる'],
+    [/(口座|名義|携帯|カード)が?.{0,12}(凍結|犯罪|事件|マネーロンダリング|資金洗浄)/,15,'口座・名義が事件に使われたと主張'],
+    [/(LINE|ライン|ビデオ通話|ZOOM|Skype).{0,10}(取り調べ|事情聴取|捜査|手続)/i,20,'LINE等で取り調べ(実際の警察は絶対しない)'],
+    [/保釈(保証)?金|供託金|保証金|示談金/,15,'お金で解決できると持ちかける'],
+    [/捜査(協力|対象|情報)|重要参考人/,8,'捜査への協力要請'],
+  ]},
+  invest: { name:'SNS型投資詐欺', icon:'📈', pat:[
+    [/元本保証/,20,'元本保証(投資で保証は違法水準の危険ワード)'],
+    [/(月利|日利|週利)\s*[0-9０-９]+/,12,'ありえない利回り'],
+    [/絶対に?(儲|損し|稼げ)|必ず儲かる|確実に(稼げる|増える)/,15,'「絶対・必ず」の断言'],
+    [/先生|講師|アナリスト|投資のプロ/,6,'「先生」の登場'],
+    [/(限定|投資|特別)グループ|コミュニティに招待/,10,'限定グループへの招待'],
+    [/自動売買|AIトレード|FX|仮想通貨|暗号資産|USDT|ビットコイン/i,8,'投資商材ワード'],
+    [/出金.{0,8}(手数料|税金|保証金|凍結解除)/,20,'出金に追加費用(典型的な出金詐欺)'],
+    [/著名人|有名(投資家|実業家)|テレビで(紹介|話題)/,6,'有名人をかたる'],
+  ]},
+  romance: { name:'ロマンス詐欺', icon:'💔', pat:[
+    [/マッチングアプリ|出会い系|SNSで知り合/,8,'ネットで知り合った相手'],
+    [/(君|あなた|二人)との?(将来|未来|夢)/,12,'将来を語って距離を詰める'],
+    [/(叔父|叔母|親戚|友人|知人)が(取引所|投資|証券|貿易)/,12,'身内の儲け話を紹介'],
+    [/軍人|軍医|パイロット|外科医|国連|海外(赴任|出張|勤務)/,10,'典型的な偽プロフィール'],
+    [/送金して|お金を(送|貸|立て替え)|工面して/,15,'会う前にお金の話'],
+    [/会ったことが?ない|まだ会えない|ビデオ通話は(できない|苦手)/,12,'絶対に会えない・顔を見せない'],
+  ]},
+  refund: { name:'還付金詐欺', icon:'🏧', pat:[
+    [/還付金|払い戻し|過払い|医療費の(返金|還付)|保険料の(返金|還付)/,15,'還付金・払い戻しの連絡'],
+    [/ATM/i,12,'ATMへ誘導(還付金はATMで戻りません)'],
+    [/(役所|市役所|区役所|年金事務所|税務署|健康保険)/,8,'役所を名乗る'],
+    [/(携帯|スマホ)を持って(ATM|銀行|コンビニ)/,20,'携帯を持ってATMへ(決定的な詐欺サイン)'],
+  ]},
+  phishing: { name:'フィッシング・偽SMS', icon:'📦', pat:[
+    [/不在|再配達|お荷物|宅配|配達|持ち帰りました/,10,'宅配の不在通知を装う'],
+    [/税関|関税|未納|未払い|滞納/,10,'未払い・税金で脅す'],
+    [/(アカウント|利用|カード|回線)が?.{0,8}(停止|凍結|制限|無効)/,12,'アカウント停止で焦らせる'],
+    [/https?:\/\/[^\s、。]+/i,8,'URLへの誘導'],
+    [/\.(top|xyz|shop|club|cn)\b|bit\.ly|tinyurl/i,12,'怪しいドメイン・短縮URL'],
+    [/(本人|情報|カード)確認|再認証|ログインして/,6,'情報の再入力要求'],
+  ]},
+  support: { name:'サポート詐欺', icon:'💻', pat:[
+    [/ウイルスに?感染|トロイの木馬|ハッキングされ/,15,'ウイルス感染の警告画面'],
+    [/(Microsoft|マイクロソフト|Apple|アップル|Windows)(の)?サポート/i,10,'大手サポートを名乗る'],
+    [/この番号に(今すぐ)?(電話|連絡)/,12,'画面の番号に電話させる'],
+    [/遠隔操作|リモート(操作|接続)/,12,'遠隔操作ソフトを入れさせる'],
+  ]},
+  ticket: { name:'チケット・先払い詐欺', icon:'🎫', pat:[
+    [/チケット(譲|売|余っ)/,10,'チケットの個人間譲渡'],
+    [/先に?(振込|振り込み|払い|送金)|前払い/,12,'先払いの要求'],
+    [/名義変更|同行入場/,6,'名義関係の口実'],
+  ]},
+};
+const GENERIC = [
+  [/今すぐ|至急|本日中|今日中|急いで|時間がない|[0-9０-９]+分以内/,8,'⏰ 焦らせる(考える時間を奪う)'],
+  [/(誰|家族|親)にも(言|話|相談)(わ|さ|し)?ない|内緒|秘密に|口外/,12,'🤫 秘密にさせる(相談させない)'],
+  [/(LINE|ライン|テレグラム|Telegram|Signal|別の?アプリ)(に|で)(移動|連絡|追加|登録|誘導)/i,10,'📱 別アプリへ誘導(証拠を残さない)'],
+  [/振込|振り込|送金|入金|電子マネー|ギフトカード|プリペイド|コンビニで(支払|購入)/,10,'💸 お金・ギフトカードの要求'],
+  [/口座番号|暗証番号|パスワード|クレジットカード番号|セキュリティコード/,12,'🔑 重要情報を聞き出す'],
+];
+
+const STATS = {
+  yamibaito:{num:'8割超',unit:'',desc:'警察が保護した闇バイト応募者544人のうち10〜30代の割合(20代45.2%・10代24.8%)。実行役の約半数はSNSの「闇バイト」応募がきっかけ。',src:'警察庁(2026年1月発表)'},
+  police:{num:'11,014',unit:'件',desc:'ニセ警察詐欺の認知件数(令和7年・全国)。被害件数は30代が最多(2,239件)、20代が2位(1,718件)。「若者は狙われない」は過去の話。',src:'警察庁 令和7年統計'},
+  invest:{num:'9,538',unit:'件',desc:'SNS型投資詐欺の認知件数(令和7年・全国、前年比+48.7%)。被害額は約1,275億円。「元本保証」「限定グループ」は決定的な危険サイン。',src:'警察庁 令和7年統計'},
+  romance:{num:'5,604',unit:'件',desc:'SNS型ロマンス詐欺の認知件数(令和7年・全国、前年比+46.5%)。被害額は約552億円。会ったことのない相手からのお金の話はほぼ詐欺。',src:'警察庁 令和7年統計'},
+  refund:{num:'27,758',unit:'件',desc:'特殊詐欺全体の認知件数(令和7年・全国)。被害額は約1,414億円で前年のほぼ2倍。還付金がATMで戻ることは絶対にない。',src:'警察庁 令和7年統計'},
+  phishing:{num:'10,521',unit:'件',desc:'東京都内の刑法犯「詐欺」認知件数(令和7年)。偽SMSのURLタップが入口になるケース多数。公式アプリ・公式サイトから確認を。',src:'警視庁オープンデータ(令和7年)'},
+  support:{num:'27,758',unit:'件',desc:'特殊詐欺全体の認知件数(令和7年・全国)。「ウイルス感染」警告画面はほぼ100%偽物。電話せず画面を閉じて。',src:'警察庁 令和7年統計'},
+  ticket:{num:'10,521',unit:'件',desc:'東京都内の刑法犯「詐欺」認知件数(令和7年)。SNSの個人間チケット売買の先払いはトラブル多発。公式リセールを使って。',src:'警視庁オープンデータ(令和7年)'},
+  none:{num:'27,758',unit:'件',desc:'特殊詐欺全体の認知件数(令和7年・全国)。手口は日々進化中。少しでも違和感があれば、送金・個人情報入力の前に相談を。',src:'警察庁 令和7年統計'},
+};
+const ADVICE = {
+  yamibaito:'このバイトには応募しない・返信しない。身分証はぜったいに送らない(家族を脅す材料にされます)。もし応募してしまっていても、今なら戻れます。',
+  police:'本物の警察がLINEやビデオ通話で取り調べをすることは絶対にありません。お金を要求された時点で100%詐欺。いったん電話を切って#9110へ。',
+  invest:'「元本保証」「絶対儲かる」は法律的にありえない勧誘です。入金する前に、金融庁の登録業者か確認を。出金できない時点で被害届を。',
+  romance:'会ったことのない相手にお金を送らない・投資アプリを入れない。プロフィール画像は画像検索すると使い回しが見つかることも。',
+  refund:'還付金はATMでは受け取れません。役所からATMへ誘導された時点で詐欺確定。電話を切って区役所の代表番号にかけ直して。',
+  phishing:'SMS内のURLは開かない。荷物や支払いの確認は、公式アプリか公式サイトをブックマークから開いて。',
+  support:'画面の番号には電話しない。ブラウザを強制終了すれば大丈夫(esc長押しや再起動)。遠隔操作ソフトは入れない。',
+  ticket:'個人間の先払い取引はしない。公式リセール・トレードを使う。相手の「急いで」は危険サイン。',
+  none:'判定材料は少なめでしたが、詐欺の手口は日々進化しています。お金・個人情報を求められたら、その前に一度相談を。',
+};
+
+function judge(text){
+  let total=0, flags=[], catScores={};
+  for(const [id,cat] of Object.entries(CATS)){
+    let s=0;
+    for(const [re,w,label] of cat.pat){
+      const m=text.match(re);
+      if(m){ s+=w; flags.push({cat:id,label,hit:m[0]}); }
+    }
+    catScores[id]=s; total+=s;
+  }
+  let generic=[];
+  for(const [re,w,label] of GENERIC){
+    const m=text.match(re);
+    if(m){ total+=w; generic.push({label,hit:m[0]}); }
+  }
+  const topCat=Object.entries(catScores).sort((a,b)=>b[1]-a[1])[0];
+  const cat=(topCat && topCat[1]>=15)?topCat[0]:'none';
+  const score=Math.min(99,total);
+  let lvl;
+  if(score>=70)lvl=3; else if(score>=40)lvl=2; else if(score>=15)lvl=1; else lvl=0;
+  return {score,lvl,cat,flags:flags.filter(f=>f.cat===cat).slice(0,6),generic:generic.slice(0,5)};
+}
+
+/* ================= チャットUI ================= */
+const LVL_META=[
+  {emoji:'🔦',name:'判定材料すくなめ',note:'危険ワードは見つからず。でも油断は禁物'},
+  {emoji:'🟡',name:'チュウイ',note:'気になるサインあり。即返信しないで'},
+  {emoji:'🟠',name:'かなりアヤシイ',note:'典型的な手口のサインが複数'},
+  {emoji:'🚨',name:'ソレヤバ!!',name2:'',note:'危険サイン多数。関わらないで'},
+];
+const chat=document.getElementById('chat');
+let lastResult=null, myMachi=null;
+
+function el(html){const d=document.createElement('div');d.innerHTML=html;return d.firstElementChild}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function scrollBottom(){chat.scrollTop=chat.scrollHeight}
+
+function addUser(text){
+  chat.appendChild(el(`<div class="row user"><div class="bubble">${esc(text)}</div></div>`));
+  scrollBottom();
+}
+function addBot(inner,{raw=false}={}){
+  const b=el(`<div class="row bot"><div class="avatar">🔦</div><div><div class="bname">ヤミバレAI</div><div class="bubble"></div></div></div>`);
+  const bub=b.querySelector('.bubble');
+  if(raw){bub.innerHTML=inner;bub.style.whiteSpace='normal';} else bub.textContent=inner;
+  chat.appendChild(b);scrollBottom();return bub;
+}
+function typing(){
+  const b=el(`<div class="row bot" id="typing"><div class="avatar">🔦</div><div class="bubble"><span class="dots"><i></i><i></i><i></i></span></div></div>`);
+  chat.appendChild(b);scrollBottom();
+}
+function untyping(){const t=document.getElementById('typing');if(t)t.remove()}
+
+function submitMsg(){
+  const ta=document.getElementById('msg');
+  const text=ta.value.trim();
+  if(!text)return;
+  ta.value='';ta.style.height='auto';
+  addUser(text);
+  typing();
+  setTimeout(()=>{untyping();showResult(text)},950);
+}
+
+function showResult(text){
+  const r=judge(text);lastResult=r;
+  const meta=LVL_META[r.lvl];
+  const catName=r.cat==='none'?'特定の型には未分類':`${CATS[r.cat].icon} ${CATS[r.cat].name}の疑い`;
+  /* レベルカード */
+  let html=`<div class="card lvl-${r.lvl}">
+    <span class="lvl-emoji">${meta.emoji}</span>
+    <div class="lvl-name">${meta.name}</div>
+    <div style="font-size:12px;color:var(--sub)">${meta.note}</div>
+    <div class="meter"><i style="width:0%" data-w="${r.score}%"></i></div>
+    <div class="score-note">ヤバ度 <b style="color:var(--txt)">${r.score}</b> /100 ・ ${catName}</div>
+  </div>`;
+  /* 危険サイン */
+  if(r.flags.length||r.generic.length){
+    html+=`<div class="card"><b style="font-size:13px">🚩 見つけた危険サイン</b>`;
+    for(const f of r.flags) html+=`<div class="flag"><span class="fx">⚠️</span><span><b>「${esc(f.hit)}」</b> — ${esc(f.label)}</span></div>`;
+    for(const g of r.generic) html+=`<div class="flag"><span class="fx"></span><span>${esc(g.label)}: <b>「${esc(g.hit)}」</b></span></div>`;
+    html+=`</div>`;
+  }
+  /* オープンデータ根拠 */
+  const st=STATS[r.cat]||STATS.none;
+  html+=`<div class="card"><b style="font-size:13px">📊 データが語る現実</b>
+    <div class="stat"><span class="num">${st.num}</span><span style="font-size:12px">${st.unit}</span><br>${st.desc}</div>`;
+  if(myMachi) html+=`<div class="stat" style="border-color:#4dc9ff"><span class="num" style="color:#4dc9ff">${myMachi.s.toLocaleString()}</span><span style="font-size:12px">件</span><br>${myMachi.n}の詐欺認知件数(令和7年)。多い町丁: ${myMachi.t.map(t=>t[0]).join('、')}</div>`;
+  html+=`<div class="src">出典: ${st.src}(実データ)</div></div>`;
+  /* アドバイス */
+  html+=`<div class="card"><b style="font-size:13px">🧭 どうすればいい?</b><div style="font-size:12.5px;margin-top:6px;line-height:1.8">${ADVICE[r.cat]||ADVICE.none}</div>
+    <div class="btnrow">
+      <button class="abtn primary" onclick="openSheet('sos')">🆘 相談先を見る</button>
+      <button class="abtn ghost" onclick="shareCard()">📸 結果カードを保存</button>
+    </div></div>`;
+  addBot(html,{raw:true});
+  /* 闇バイト特別警告 */
+  if(r.cat==='yamibaito'){
+    addBot(`<div class="alert-card"><h3>⚠️ それ、闇バイトの入口です</h3>
+    <p>「運ぶだけ」「受け取るだけ」で始まり、気づいたら特殊詐欺や強盗の実行役に。<b>捕まるのは末端のあなただけ</b>で、指示役は逃げます。<br><br>
+    もう応募してしまっていても、<b>今なら戻れます</b>。警察は約1年間で544人の応募者を保護しました。あなたを罰するためではなく、守るために動きます。</p>
+    <div class="btnrow">
+      <button class="abtn danger" onclick="location.href='tel:%239110'">📞 #9110 に電話</button>
+      <button class="abtn ghost" onclick="openSheet('sos')">他の相談先</button>
+    </div></div>`,{raw:true});
+  }
+  /* メーターアニメ */
+  requestAnimationFrame(()=>{document.querySelectorAll('.meter i').forEach(m=>m.style.width=m.dataset.w)});
+  scrollBottom();
+}
+
+/* ================= サンプル ================= */
+const SAMPLES=[
+  {label:'🕳️ 高額バイトのDM',text:'【急募】即日日給5万円💰 荷物を受け取って運ぶだけの簡単ホワイト案件です。年齢不問・面接なし。身分証の写真を送ってもらえたらすぐ案件を紹介します。詳細はTelegramで話します。今日中に連絡ください!'},
+  {label:'👮 警察を名乗る電話',text:'こちら警視庁サイバー犯罪対策課です。あなたの口座がマネーロンダリング事件に使われており、逮捕状が出ています。LINEで事情聴取に応じれば逮捕は保留できます。捜査情報なので家族にも言わないでください。保釈保証金を指定口座に振込してください。'},
+  {label:'📈 投資グループ招待',text:'先生の限定グループにあなたを特別に招待します✨ AIの自動売買で月利30%、元本保証なので絶対に損はしません。著名投資家も参加しています。まずは10万円から入金でOK。出金には手数料が必要です。'},
+  {label:'💔 恋人からのお願い',text:'(マッチングアプリで知り合って2週間、まだ会ったことがない相手から)君との将来のために一緒に資産を増やしたいんだ。僕の叔父が取引所をやっていて必ず儲かる。二人の夢のために、まず50万円送金してほしい。ビデオ通話は仕事の関係でできない。'},
+  {label:'📦 不在通知SMS',text:'お客様宛にお荷物のお届けにあがりましたが不在の為持ち帰りました。本日中にご確認ください。 http://sagawa-delivery.top/track'},
+];
+const samplesEl=document.getElementById('samples');
+for(const s of SAMPLES){
+  const c=el(`<button class="chip">${s.label}</button>`);
+  c.onclick=()=>{addUser(s.text);typing();setTimeout(()=>{untyping();showResult(s.text)},950)};
+  samplesEl.appendChild(c);
+}
+
+/* ================= わがまち ================= */
+const sel=document.getElementById('machi-select');
+for(const w of WAGAMACHI){const o=document.createElement('option');o.value=w.n;o.textContent=w.n;sel.appendChild(o)}
+function showMachi(){
+  const w=WAGAMACHI.find(x=>x.n===sel.value);
+  if(!w)return;
+  myMachi=w;closeSheets();
+  addBot(`<div class="card"><b style="font-size:13px">📍 ${w.n}のリアル</b>
+  <div class="stat"><span class="num">${w.s.toLocaleString()}</span><span style="font-size:12px">件</span><br>${w.n}の刑法犯「詐欺」認知件数(令和7年)。</div>
+  <div style="font-size:12.5px;margin-top:8px">とくに多い町丁:<br>${w.t.map((t,i)=>`${['🥇','🥈','🥉'][i]} ${t[0]} <b>${t[1]}件</b>`).join('<br>')}</div>
+  <div class="src">出典: 警視庁「区市町村の町丁別、手口別認知件数(令和7年)」</div></div>
+  <div style="font-size:12px;margin-top:8px">これ以降の判定に、${w.n}のデータも表示するね。</div>`,{raw:true});
+}
+
+/* ================= シェアカード ================= */
+function shareCard(){
+  if(!lastResult)return;
+  const r=lastResult,meta=LVL_META[r.lvl];
+  const cv=document.createElement('canvas');cv.width=1080;cv.height=1080;
+  const x=cv.getContext('2d');
+  const g=x.createLinearGradient(0,0,1080,1080);g.addColorStop(0,'#0d1020');g.addColorStop(1,'#1a1030');
+  x.fillStyle=g;x.fillRect(0,0,1080,1080);
+  x.fillStyle='#ffd54d';x.font='900 64px "Zen Maru Gothic",sans-serif';x.textAlign='center';
+  x.fillText('🔦 ヤミバレ 判定',540,140);
+  x.font='900 220px "Zen Maru Gothic",sans-serif';
+  x.fillStyle=r.lvl>=3?'#ff4d5e':r.lvl===2?'#ffb020':r.lvl===1?'#ffd54d':'#4dc9ff';
+  x.fillText(String(r.score),540,480);
+  x.fillStyle='#9aa3c7';x.font='500 44px "Noto Sans JP",sans-serif';x.fillText('ヤバ度 /100',540,560);
+  x.fillStyle='#eef1ff';x.font='900 90px "Zen Maru Gothic",sans-serif';
+  x.fillText(`${meta.emoji} ${meta.name}`,540,700);
+  const catName=r.cat==='none'?'未分類':CATS[r.cat].name;
+  x.font='700 48px "Noto Sans JP",sans-serif';x.fillStyle='#ffd54d';x.fillText(catName,540,790);
+  x.fillStyle='#9aa3c7';x.font='400 32px "Noto Sans JP",sans-serif';
+  x.fillText('根拠: 警察庁・警視庁オープンデータ(令和7年)',540,920);
+  x.fillText('届いたら、貼るだけ。#ヤミバレ',540,975);
+  cv.toBlob(async b=>{
+    const f=new File([b],'yamibare.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[f]})){
+      try{await navigator.share({files:[f],title:'ヤミバレ判定'});return}catch(e){}
+    }
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='yamibare.png';a.click();
+  });
+}
+
+/* ================= シート ================= */
+function openSheet(id){closeSheets();document.getElementById('sheet-'+id).classList.add('on')}
+function closeSheets(){document.querySelectorAll('.sheet-wrap').forEach(s=>s.classList.remove('on'))}
+
+/* ================= 起動 ================= */
+const ta=document.getElementById('msg');
+ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(110,ta.scrollHeight)+'px'});
+ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))submitMsg()});
+
+const IS_DEMO=new URLSearchParams(location.search).has('demo');
+addBot('やっほー、ヤミバレAIだよ🔦\n怪しいDM・バイト募集・儲け話が届いたら、そのままここに貼って!\n危険サインとオープンデータで「ヤバさ」を照らすよ。');
+if(!IS_DEMO)setTimeout(()=>addBot('まずは下のサンプルを押してみて👇\n(あなたが貼った内容はこの端末の中だけで判定。どこにも送信しないよ)'),600);
+
+/* ================= デモモード(?demo=) — スクショ・動画撮影用 ================= */
+(function(){
+  const qp=new URLSearchParams(location.search);
+  const demo=qp.get('demo');
+  if(!demo)return;
+  const MAP={yamibaito:0,police:1,invest:2,romance:3,sms:4};
+  const area=qp.get('area');
+  if(area){const w=WAGAMACHI.find(x=>x.n===area);if(w)myMachi=w;}
+  if(demo==='machi'){
+    sel.value=area||'新宿区';showMachi();
+  }else if(demo in MAP){
+    const smp=SAMPLES[MAP[demo]];
+    addUser(smp.text);showResult(smp.text);
+    const focus=qp.get('focus');
+    setTimeout(()=>{
+      let target=null;
+      if(focus==='alert'){const a=document.querySelectorAll('.alert-card');target=a[a.length-1];}
+      else{const c=document.querySelectorAll('.bubble .card');target=c[0];}
+      if(target)target.scrollIntoView({behavior:'instant',block:focus==='alert'?'center':'start'});
+    },400);
+  }
+})();
+</script>
+</body>
+</html>
