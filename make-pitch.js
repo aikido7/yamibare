@@ -70,7 +70,7 @@ function statCard(s, x, y, w, num, unit, label, color) {
   const s = baseSlide();
   header(s, '解決 — サービスデザイン', '貼るだけ、3秒。届いた瞬間の行動を変える');
   const steps = [
-    ['1', '貼る', 'LINE風チャットに、怪しいDM・バイト募集・儲け話をそのまま貼る。読む教材ではなく"使う道具"', C.green],
+    ['1', '知る・貼る', '4コマ漫画で手口を知り、届いた怪しいDMはLINE風チャットにそのまま貼る。読む教材ではなく"使う道具"', C.green],
     ['2', 'ヤミがバレる', 'ヤバ度0〜99と「引っかかった言葉」を根拠つきで表示。8カテゴリ(闇バイト/ニセ警察/SNS投資/ロマンス他)', C.gold],
     ['3', '出口へつなぐ', '公的実データで「自分ごと化」→ #9110・ヤング・テレホン等へワンタップ発信', C.blue],
   ];
@@ -108,16 +108,17 @@ function statCard(s, x, y, w, num, unit, label, color) {
   s.addText('貼るだけで判定…', { x: 1.3, y: 6.28, w: 2.2, h: 0.34, fontFace: FONT, fontSize: 8.5, color: C.sub, margin: 0 });
   // 右: 説明
   const feats = [
+    ['📰 今日の手口マンガ', '実際の手口を4コマで。読んだ直後に同じ手口を判定で試せる(全6本・日替わり)'],
     ['🚩 根拠を見せる判定', '「どの言葉が危険か」を1つずつ提示。ヤバ度メーターで直感的に'],
     ['📊 実データで自分ごと化', '「あなたの年代で急増」「あなたの区で688件」— 公的統計が根拠'],
     ['🆘 相談まで1タップ', '#9110・ヤング・テレホン・188へ発信。誰にも知られず相談できる'],
     ['📸 シェアカード', '判定結果をPNGカード化。友達に回して「守る側」を増やす'],
   ];
   feats.forEach((f, i) => {
-    const y = 2.05 + i * 1.22;
-    card(s, 4.6, y, 8.1, 1.05);
-    s.addText(f[0], { x: 4.9, y: y + 0.12, w: 7.6, h: 0.4, fontFace: FONT, fontSize: 15, bold: true, color: C.gold, margin: 0 });
-    s.addText(f[1], { x: 4.9, y: y + 0.52, w: 7.6, h: 0.45, fontFace: FONT, fontSize: 12.5, color: C.sub, margin: 0 });
+    const y = 2.0 + i * 0.99;
+    card(s, 4.6, y, 8.1, 0.87);
+    s.addText(f[0], { x: 4.9, y: y + 0.08, w: 7.6, h: 0.36, fontFace: FONT, fontSize: 14, bold: true, color: C.gold, margin: 0 });
+    s.addText(f[1], { x: 4.9, y: y + 0.44, w: 7.6, h: 0.38, fontFace: FONT, fontSize: 11.5, color: C.sub, margin: 0 });
   });
   footer(s, 4);
 }

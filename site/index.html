@@ -111,6 +111,23 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
   padding:11px;font-family:inherit;font-size:14px;margin-bottom:10px}
 .close-x{margin-left:auto;background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer}
 .sheet-head{display:flex;align-items:center}
+/* ---- manga ---- */
+.mg-head{background:linear-gradient(135deg,#2a2050,#1a1f3d);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
+.mg-date{font-size:11px;color:var(--accent);font-weight:700}
+.mg-title{font-family:'Zen Maru Gothic';font-weight:900;font-size:19px;margin-top:3px;line-height:1.35}
+.mg-tag{display:inline-block;background:#0b0e1c;border:1px solid var(--line);border-radius:11px;padding:2px 9px;font-size:11px;color:var(--sub);margin-top:6px}
+.mpanel{border:2px solid #38406e;border-radius:12px;overflow:hidden;margin-bottom:10px;background:#0b0e1c}
+.mnarr{font-size:11.5px;line-height:1.6;color:var(--txt);background:#161b30;padding:7px 11px;border-bottom:1px solid #38406e}
+.mstage{position:relative;min-height:118px;display:flex;align-items:center;gap:10px;padding:13px 12px}
+.mchar{font-size:44px;flex-shrink:0;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))}
+.mbubble{position:relative;background:#f3f5ff;color:#14182b;border-radius:13px;padding:9px 12px;font-size:12.5px;
+  line-height:1.6;font-weight:500;flex:1}
+.mbubble:after{content:'';position:absolute;left:-7px;top:20px;border:7px solid transparent;border-right-color:#f3f5ff;border-left:0}
+.mbubble.think{background:#e6e9f8;border-radius:16px}
+.mno{position:absolute;right:7px;top:5px;font-size:10px;color:rgba(255,255,255,.4);font-weight:700}
+.mg-foot{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:2px}
+.mg-foot .fl{font-size:12.5px;line-height:1.8}
+.mg-nav{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -121,6 +138,7 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
       <div class="tagline">届いたら、貼るだけ。闇バイト・詐欺チェッカー</div>
     </div>
     <div class="hbtns">
+      <button class="hbtn" onclick="openManga()">📰マンガ</button>
       <button class="hbtn" onclick="openSheet('machi')">📍わがまち</button>
       <button class="hbtn" onclick="openSheet('sos')">🆘相談先</button>
     </div>
@@ -155,6 +173,15 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
       <div class="note">警視庁オープンデータ(令和7年・区市町村の町丁別/手口別認知件数)から、あなたの街の「詐欺」認知件数を表示します。</div>
       <select id="machi-select"><option value="">区市町村を選ぶ</option></select>
       <button class="abtn primary" style="width:100%" onclick="showMachi()">この街のデータを見る</button>
+    </div>
+  </div>
+
+  <!-- 今日の手口マンガ -->
+  <div class="sheet-wrap" id="sheet-manga" onclick="if(event.target===this)closeSheets()">
+    <div class="sheet">
+      <div class="sheet-head"><h2>📰 今日の手口マンガ</h2><button class="close-x" onclick="closeSheets()">✕</button></div>
+      <div class="note">実際に起きている手口を4コマで。毎日1本、日替わりで届きます。</div>
+      <div id="manga-body"></div>
     </div>
   </div>
 
@@ -516,6 +543,75 @@ function shareCard(){
   });
 }
 
+/* ================= 今日の手口マンガ ================= */
+const MANGA=[
+ {key:'yamibaito',title:'「運ぶだけ」の一本道',tag:'🕳️ 闇バイト',demo:0,
+  panels:[
+   {n:'深夜のSNS。流れてきた1件の募集',c:'🧑‍🎓',s:'今月、マジで金ないな…',bg:'#141a33',think:1},
+   {n:'面接なし・年齢不問・即日払い',c:'📱',s:'日給5万円!荷物を受け取って運ぶだけの簡単ホワイト案件です',bg:'#1a2140'},
+   {n:'送った瞬間、家族の住所まで相手の手に',c:'🪪',s:'身分証だけ送ってね。あとの連絡はTelegramで',bg:'#241a33'},
+   {n:'捕まるのは運んだ本人だけ。指示役は顔も名前も知らない',c:'🚓',s:'「話が違う」は、通らない。',bg:'#2a1420'}],
+  end:'でも、もう応募していても戻れます。警察は約1年で544人を保護しました。'},
+ {key:'police',title:'電話の向こうの「警察官」',tag:'👮 ニセ警察',demo:1,
+  panels:[
+   {n:'昼下がり、知らない番号から着信',c:'📞',s:'警視庁の者です。あなたの口座が事件に使われています',bg:'#141a33'},
+   {n:'画面には警察手帳らしきものが映る',c:'👮',s:'今からLINEのビデオ通話で取り調べを行います',bg:'#1a2140'},
+   {n:'「家族にも言わないでください」',c:'💸',s:'保釈保証金を今日中に振り込めば、逮捕は保留にできます',bg:'#241a33'},
+   {n:'本物の警察はLINEで取り調べもしないし、お金も要求しない',c:'❗',s:'全部、ニセモノ。',bg:'#2a1420'}],
+  end:'ニセ警察詐欺の被害は30代が最多(2,239件)。若い世代ほど狙われています。'},
+ {key:'adfraud',title:'AIがつくった「あの有名人」',tag:'🎭 なりすまし広告',demo:5,
+  panels:[
+   {n:'YouTubeの広告に、見覚えのある実業家',c:'📱',s:'本人が語る、資産形成のメソッド',bg:'#141a33'},
+   {n:'声も顔も本人そっくり。でも、AIの合成',c:'🎭',s:'私が直接、無料で教えます',bg:'#1a2140'},
+   {n:'広告から出た時点で、相手の土俵',c:'💬',s:'まずは公式LINEに友だち追加してください',bg:'#241a33'},
+   {n:'SNS型投資詐欺の入口はYouTubeが27.1%。国も8月7日、5社に対策を要請した',c:'📊',s:'本人は、投資を勧めていない。',bg:'#2a1420'}],
+  end:'気になったら、広告のリンクではなく公式サイトを自分で検索して確かめて。'},
+ {key:'invest',title:'「先生」の限定グループ',tag:'📈 SNS型投資詐欺',demo:2,
+  panels:[
+   {n:'知らないアカウントからのDM',c:'💬',s:'先生の限定グループに、あなたを特別にご招待します✨',bg:'#141a33'},
+   {n:'グループでは毎日「儲かった」報告が並ぶ',c:'📈',s:'月利30%、元本保証。絶対に損はしません',bg:'#1a2140'},
+   {n:'10万円が、画面の上では50万円に',c:'💰',s:'増えていくのは、数字だけ。',bg:'#241a33'},
+   {n:'手数料を払っても、出金はできない',c:'🚪',s:'出金には手数料が必要です',bg:'#2a1420'}],
+  end:'「元本保証」は投資では法律的にありえない勧誘。入金前に金融庁の登録業者か確認を。'},
+ {key:'romance',title:'会えない恋人',tag:'💔 ロマンス詐欺',demo:3,
+  panels:[
+   {n:'マッチングアプリで知り合って2週間',c:'💘',s:'あなたと話すのが、毎日の楽しみなんだ',bg:'#141a33'},
+   {n:'写真はいつも同じ角度。顔は一度も見ていない',c:'🌏',s:'海外赴任中で、ビデオ通話はできなくて…',bg:'#1a2140'},
+   {n:'はじめての、お金の話',c:'💵',s:'叔父の取引所なら必ず増える。二人の将来のために',bg:'#241a33'},
+   {n:'送金した先に、その人はいない',c:'🕳️',s:'会えない相手のお金の話は、ほぼ詐欺。',bg:'#2a1420'}],
+  end:'プロフィール画像を画像検索すると、使い回しが見つかることもあります。'},
+ {key:'phishing',title:'不在通知のURL',tag:'📦 フィッシング',demo:4,
+  panels:[
+   {n:'心当たりはある。通販を頼んでいた',c:'📦',s:'お荷物のお届けにあがりましたが、不在のため持ち帰りました',bg:'#141a33'},
+   {n:'URLの末尾が .top。公式のドメインとは違う',c:'🔗',s:'本日中にご確認ください',bg:'#1a2140'},
+   {n:'入力したIDとパスワードは、そのまま相手の手元へ',c:'🔑',s:'本人確認のため、ログインしてください',bg:'#241a33'},
+   {n:'気づいたときには、カードが使われている',c:'💳',s:'荷物の確認は、公式アプリから。',bg:'#2a1420'}],
+  end:'SMSのURLは開かない。ブックマークした公式サイトから確認するのが確実です。'}
+];
+function todayIdx(){const d=new Date();return (d.getFullYear()*372+d.getMonth()*31+d.getDate())%MANGA.length}
+let mgIdx=todayIdx();
+function renderManga(){
+  const m=MANGA[mgIdx],d=new Date();
+  const ds=`${d.getMonth()+1}月${d.getDate()}日`;
+  let h=`<div class="mg-head"><div class="mg-date">${mgIdx===todayIdx()?ds+'の1本':'アーカイブ'}</div>
+    <div class="mg-title">${m.title}</div><span class="mg-tag">${m.tag}</span></div>`;
+  m.panels.forEach((p,i)=>{
+    h+=`<div class="mpanel"><div class="mnarr">${esc(p.n)}</div>
+      <div class="mstage" style="background:${p.bg}"><span class="mno">${i+1}</span>
+      <span class="mchar">${p.c}</span><span class="mbubble${p.think?' think':''}">${esc(p.s)}</span></div></div>`;
+  });
+  h+=`<div class="mg-foot"><div class="fl">🔦 ${esc(m.end)}</div>
+    <div class="mg-nav">
+      <button class="abtn primary" onclick="tryManga(${m.demo})">この手口をヤミバレで試す</button>
+      <button class="abtn ghost" onclick="nextManga()">別の手口を読む →</button>
+      <button class="abtn ghost" onclick="openSheet('sos')">🆘 相談先</button>
+    </div></div>`;
+  document.getElementById('manga-body').innerHTML=h;
+}
+function openManga(){closeSheets();renderManga();document.getElementById('sheet-manga').classList.add('on')}
+function nextManga(){mgIdx=(mgIdx+1)%MANGA.length;renderManga();document.querySelector('#sheet-manga .sheet').scrollTop=0}
+function tryManga(i){closeSheets();const t=SAMPLES[i].text;addUser(t);typing();setTimeout(()=>{untyping();showResult(t)},900)}
+
 /* ================= シート ================= */
 function openSheet(id){closeSheets();document.getElementById('sheet-'+id).classList.add('on')}
 function closeSheets(){document.querySelectorAll('.sheet-wrap').forEach(s=>s.classList.remove('on'))}
@@ -527,7 +623,11 @@ ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))sub
 
 const IS_DEMO=new URLSearchParams(location.search).has('demo');
 addBot('やっほー、ヤミバレAIだよ🔦\n怪しいDM・バイト募集・儲け話が届いたら、そのままここに貼って!\n危険サインとオープンデータで「ヤバさ」を照らすよ。');
-if(!IS_DEMO)setTimeout(()=>addBot('まずは下のサンプルを押してみて👇\n(あなたが貼った内容はこの端末の中だけで判定。どこにも送信しないよ)'),600);
+if(!IS_DEMO){
+  setTimeout(()=>addBot('まずは下のサンプルを押してみて👇\n(あなたが貼った内容はこの端末の中だけで判定。どこにも送信しないよ)'),600);
+  setTimeout(()=>addBot(`<div style="margin-bottom:8px">📰 今日の手口マンガも届いてるよ。<br><b style="color:var(--accent)">${MANGA[todayIdx()].title}</b></div>
+    <button class="abtn primary" onclick="openManga()">4コマで読む</button>`,{raw:true}),1200);
+}
 
 /* ================= デモモード(?demo=) — スクショ・動画撮影用 ================= */
 (function(){
