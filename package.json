@@ -1,0 +1,13 @@
+{
+  "name": "yamibare",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ヤミバレ — 届いたら、貼るだけ。若者向け 闇バイト・詐欺チェッカー",
+  "scripts": {
+    "pitch": "node make-pitch.js",
+    "deploy": "wrangler pages deploy site --project-name yamibare --commit-dirty=true"
+  },
+  "dependencies": {
+    "pptxgenjs": "^3.12.0"
+  }
+}

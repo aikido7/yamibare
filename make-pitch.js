@@ -1,5 +1,5 @@
 // ヤミバレ 2分ピッチ 7枚 (都知事杯オープンデータ・ハッカソン2026)
-const pptxgen = require('/private/tmp/claude-502/-Users-aikido/12a1748f-2645-4ed7-9774-2cc2a60b9b34/scratchpad/node_modules/pptxgenjs');
+const pptxgen = require('pptxgenjs');
 
 const C = {
   bg: '0D1020', panel: '1E2440', panel2: '232A4A', line: '2A3155',
@@ -56,11 +56,12 @@ function statCard(s, x, y, w, num, unit, label, color) {
   statCard(s, 0.6, 2.1, 3.94, '30代', 'が最多', 'ニセ警察詐欺の被害件数。30代 2,239件、20代 1,718件で若い世代が上位2つを占める', C.red);
   statCard(s, 4.7, 2.1, 3.94, '8割', '超', '警察が約1年で保護した闇バイト応募者544人のうち、10〜30代の割合(20代45.2%・10代24.8%)', C.red);
   statCard(s, 8.8, 2.1, 3.94, '1,414', '億円', '特殊詐欺の年間被害額(前年のほぼ2倍)。SNS型投資詐欺は9,538件と約1.5倍に急増', C.gold);
-  card(s, 0.6, 5.5, 12.14, 1.25, C.panel2);
+  card(s, 0.6, 5.4, 12.14, 1.45, C.panel2);
   s.addText([
     { text: '若者は、騙される被害者にも、使い捨ての実行役にもなる。', options: { bold: true, color: C.white } },
-    { text: 'それでも既存の啓発はポスター・講習など高齢者向けの一方向のまま。「自分は騙されない」と思っている若者には届かない。', options: { color: C.sub } },
-  ], { x: 0.95, y: 5.68, w: 11.5, h: 0.9, fontFace: FONT, fontSize: 15, lineSpacing: 24, margin: 0 });
+    { text: '入口は日常のSNS広告だ。国は2026年8月7日、8省庁連名でGoogle・Meta・TikTok・X・LINEヤフーに「なりすまし詐欺広告」対策を要請した。', options: { color: C.sub } },
+    { text: 'だがそれは事業者側の対策。いま自分に届いた広告を確かめる手段は、利用者にない。', options: { bold: true, color: C.gold } },
+  ], { x: 0.95, y: 5.55, w: 11.5, h: 1.15, fontFace: FONT, fontSize: 14.5, lineSpacing: 23, margin: 0 });
   footer(s, 2);
 }
 
@@ -128,18 +129,19 @@ function statCard(s, x, y, w, num, unit, label, color) {
   const rows = [
     ['警視庁', '区市町村の町丁別・手口別認知件数(令和7年CSV)', '59区市町村+町丁TOP3を自動集計して内蔵。「わがまち」を選ぶと判定根拠が自分の街の実数に変わる(都内計10,521件)', '利用中', C.gold],
     ['警察庁', '特殊詐欺・SNS型投資/ロマンス詐欺 認知・検挙状況(令和7年確定値)', '年代別・手口別の実数を判定カードに表示。「30代最多・20代2位」など若者への根拠提示の核', '利用中', C.gold],
-    ['国税庁', '法人番号公表サイト Web-API', 'バイト求人の会社が実在するかチェック。闇バイト求人の見分けを制度データで補強', '本選実装', C.blue],
+    ['8省庁', 'SNS等におけるなりすまし詐欺広告に関する対策の強化について(要請)/令和8年8月7日', '詐欺の入口となった広告の割合(YouTube27.1%・Instagram16.3%・TikTok10.4%他)を判定根拠に搭載。国の要請=事業者側の対策、ヤミバレ=利用者側の防御', '利用中', C.gold],
+    ['国税庁', '法人番号公表サイト Web-API', 'バイト求人の会社が実在するかチェック。要請が求める「商業登記電子証明書による法人の本人確認」と同じ方向', '本選実装', C.blue],
   ];
   rows.forEach((r, i) => {
-    const y = 2.1 + i * 1.5;
-    card(s, 0.6, y, 12.14, 1.32);
-    s.addText(r[0], { x: 0.9, y: y + 0.16, w: 1.5, h: 0.45, fontFace: FONT, fontSize: 16, bold: true, color: C.white, margin: 0 });
-    s.addShape('ROUNDED_RECTANGLE', { x: 0.9, y: y + 0.72, w: 1.15, h: 0.4, rectRadius: 0.08, fill: { color: r[4] }, line: { type: 'none' } });
-    s.addText(r[3], { x: 0.9, y: y + 0.72, w: 1.15, h: 0.4, fontFace: FONT, fontSize: 11, bold: true, color: C.bg, align: 'center', valign: 'middle', margin: 0 });
-    s.addText(r[1], { x: 2.5, y: y + 0.16, w: 10.0, h: 0.45, fontFace: FONT, fontSize: 14, bold: true, color: C.gold, margin: 0 });
-    s.addText(r[2], { x: 2.5, y: y + 0.62, w: 10.0, h: 0.6, fontFace: FONT, fontSize: 12, color: C.sub, lineSpacing: 17, margin: 0 });
+    const y = 2.0 + i * 1.18;
+    card(s, 0.6, y, 12.14, 1.06);
+    s.addText(r[0], { x: 0.9, y: y + 0.1, w: 1.5, h: 0.38, fontFace: FONT, fontSize: 14.5, bold: true, color: C.white, margin: 0 });
+    s.addShape('ROUNDED_RECTANGLE', { x: 0.9, y: y + 0.55, w: 1.1, h: 0.36, rectRadius: 0.08, fill: { color: r[4] }, line: { type: 'none' } });
+    s.addText(r[3], { x: 0.9, y: y + 0.55, w: 1.1, h: 0.36, fontFace: FONT, fontSize: 10, bold: true, color: C.bg, align: 'center', valign: 'middle', margin: 0 });
+    s.addText(r[1], { x: 2.45, y: y + 0.1, w: 10.1, h: 0.4, fontFace: FONT, fontSize: 12.5, bold: true, color: C.gold, margin: 0 });
+    s.addText(r[2], { x: 2.45, y: y + 0.5, w: 10.1, h: 0.5, fontFace: FONT, fontSize: 11, color: C.sub, lineSpacing: 15, margin: 0 });
   });
-  s.addText('ほか利用予定: 東京都 消費生活相談データ / 金融庁 登録業者一覧 / 東京都 行政区域・人口データ 等', { x: 0.6, y: 6.6, w: 12.1, h: 0.35, fontFace: FONT, fontSize: 11, color: C.sub, margin: 0 });
+  s.addText('ほか利用予定: 東京都 消費生活相談データ / 金融庁 登録業者一覧 / 東京都 行政区域・人口データ 等', { x: 0.6, y: 6.75, w: 12.1, h: 0.3, fontFace: FONT, fontSize: 10.5, color: C.sub, margin: 0 });
   footer(s, 5);
 }
 
