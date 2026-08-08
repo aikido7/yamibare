@@ -34,7 +34,7 @@ header{
 .tagline{font-size:10.5px;color:var(--sub);margin-top:1px}
 .hbtns{margin-left:auto;display:flex;gap:6px}
 .hbtn{border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:14px;
-  padding:6px 10px;font-size:11.5px;font-family:inherit;cursor:pointer}
+  padding:6px 9px;font-size:11px;font-family:inherit;cursor:pointer;white-space:nowrap}
 /* ---- chat ---- */
 #chat{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
 .row{display:flex;gap:8px;align-items:flex-end;animation:pop .25s ease}
@@ -135,7 +135,7 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
   <header>
     <div>
       <div class="logo"><span class="torch">🔦</span> ヤミバレ</div>
-      <div class="tagline">届いたら、貼るだけ。闇バイト・詐欺チェッカー</div>
+      <div class="tagline">届いたら、貼るだけ。</div>
     </div>
     <div class="hbtns">
       <button class="hbtn" onclick="openManga()">📰マンガ</button>
@@ -639,6 +639,13 @@ if(!IS_DEMO){
   if(area){const w=WAGAMACHI.find(x=>x.n===area);if(w)myMachi=w;}
   if(demo==='machi'){
     sel.value=area||'新宿区';showMachi();
+  }else if(demo==='manga'){
+    const k=qp.get('story');
+    if(k){const j=MANGA.findIndex(m=>m.key===k);if(j>=0)mgIdx=j;}
+    openManga();
+    if(qp.get('focus')==='end')setTimeout(()=>{const s=document.querySelector('#sheet-manga .sheet');s.scrollTop=s.scrollHeight},350);
+  }else if(demo==='sos'){
+    openSheet('sos');
   }else if(demo in MAP){
     const smp=SAMPLES[MAP[demo]];
     addUser(smp.text);showResult(smp.text);
