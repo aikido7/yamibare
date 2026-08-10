@@ -59,7 +59,7 @@ function statCard(s, x, y, w, num, unit, label, color) {
   card(s, 0.6, 5.4, 12.14, 1.45, C.panel2);
   s.addText([
     { text: '若者は、騙される被害者にも、使い捨ての実行役にもなる。', options: { bold: true, color: C.white } },
-    { text: '入口は日常のSNS広告だ。国は2026年8月7日、8省庁連名でGoogle・Meta・TikTok・X・LINEヤフーに「なりすまし詐欺広告」対策を要請した。', options: { color: C.sub } },
+    { text: '入口は日常のSNS広告だ。国は2026年8月7日、7省庁連名でGoogle・Meta・TikTok・X・LINEヤフーに「なりすまし詐欺広告」対策を要請した。', options: { color: C.sub } },
     { text: 'だがそれは事業者側の対策。いま自分に届いた広告を確かめる手段は、利用者にない。', options: { bold: true, color: C.gold } },
   ], { x: 0.95, y: 5.55, w: 11.5, h: 1.15, fontFace: FONT, fontSize: 14.5, lineSpacing: 23, margin: 0 });
   footer(s, 2);
@@ -130,7 +130,7 @@ function statCard(s, x, y, w, num, unit, label, color) {
   const rows = [
     ['警視庁', '区市町村の町丁別・手口別認知件数(令和7年CSV)', '59区市町村+町丁TOP3を自動集計して内蔵。「わがまち」を選ぶと判定根拠が自分の街の実数に変わる(都内計10,521件)', '利用中', C.gold],
     ['警察庁', '特殊詐欺・SNS型投資/ロマンス詐欺 認知・検挙状況(令和7年確定値)', '年代別・手口別の実数を判定カードに表示。「30代最多・20代2位」など若者への根拠提示の核', '利用中', C.gold],
-    ['8省庁', 'SNS等におけるなりすまし詐欺広告に関する対策の強化について(要請)/令和8年8月7日', '詐欺の入口となった広告の割合(YouTube27.1%・Instagram16.3%・TikTok10.4%他)を判定根拠に搭載。国の要請=事業者側の対策、ヤミバレ=利用者側の防御', '利用中', C.gold],
+    ['7省庁', 'SNS等におけるなりすまし詐欺広告に関する対策の強化について(要請)/令和8年8月7日', '詐欺の入口となった広告の割合(YouTube27.1%・Instagram16.3%・TikTok10.4%他)を判定根拠に搭載。国の要請=事業者側の対策、ヤミバレ=利用者側の防御', '利用中', C.gold],
     ['国税庁', '法人番号公表サイト Web-API', 'バイト求人の会社が実在するかチェック。要請が求める「商業登記電子証明書による法人の本人確認」と同じ方向', '本選実装', C.blue],
   ];
   rows.forEach((r, i) => {
