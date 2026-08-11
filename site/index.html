@@ -8,132 +8,229 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Zen+Maru+Gothic:wght@700;900&display=swap" rel="stylesheet">
 <style>
+/* ============================================================
+   ヤミバレ デザイントークン  — 正典: ../DESIGN_DIRECTION.md
+   主レジスター=親愛 / 副=劇場(判定開示のみ)
+   色は下記11色のみ。増やすときは先に DESIGN_DIRECTION.md を更新する
+   ============================================================ */
 :root{
-  --bg:#0d1020; --panel:#161b30; --panel2:#1e2440;
-  --bot:#232a4a; --user:#06c755; --txt:#eef1ff; --sub:#9aa3c7;
-  --yaba:#ff4d5e; --warn:#ffb020; --care:#ffd54d; --safe:#4dc9ff;
-  --line:#2a3155; --accent:#ffd54d;
+  /* 面 */
+  --bg:#0B0F1E; --panel:#161C33; --panel2:#1F2742; --line:#2E3757; --sunken:#0A0E1B;
+  /* 文字 */
+  --txt:#EDF0FA; --sub:#98A1C4;
+  /* 灯り・自分 */
+  --accent:#FFD54D; --user:#06C755; --on-accent:#20180A; --on-user:#04240F;
+  /* 判定4段 */
+  --lv3:#FF4D5E; --lv2:#FF9F1C; --lv1:#FFD54D; --lv0:#4DC9FF;
+  /* タイポ 8段(整数のみ) */
+  --f-cap:11px; --f-sm:12px; --f-bs:13px; --f-bd:15px;
+  --f-ts:18px; --f-tt:22px; --f-dp:30px; --f-hero:44px;
+  /* 余白 8ptグリッド(4は光学調整用) */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px;
+  /* 角丸 3種 */
+  --r-s:8px; --r-m:14px; --r-l:20px;
+  /* モーション */
+  --mo:160ms cubic-bezier(.2,.7,.3,1); --mo-reveal:420ms cubic-bezier(.2,.8,.25,1);
+  --reveal-dur:420ms; --reveal-ease:cubic-bezier(.2,.8,.25,1);
+  --disp:'Zen Maru Gothic',system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
-body{
-  font-family:'Noto Sans JP',sans-serif;background:#070912;color:var(--txt);
-  display:flex;justify-content:center;
-}
+body{font-family:'Noto Sans JP',sans-serif;background:#060911;color:var(--txt);display:flex;justify-content:center;
+  font-feature-settings:"palt";}
 #app{width:100%;max-width:520px;height:100dvh;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* 絵文字は図として扱う: 行位置とサイズを明示的に揃える */
+.emo{font-style:normal;line-height:1;display:inline-block;vertical-align:-.1em}
+
 /* ---- header ---- */
-header{
-  padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;
-  background:linear-gradient(135deg,#12172e 0%,#1a1f3d 100%);
-  border-bottom:1px solid var(--line);
-  display:flex;align-items:center;gap:10px;z-index:5;
-}
-.logo{font-family:'Zen Maru Gothic';font-weight:900;font-size:20px;letter-spacing:1px;
-  background:linear-gradient(90deg,#ffd54d,#ff8a5c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.logo .torch{-webkit-text-fill-color:initial;font-size:18px}
-.tagline{font-size:10.5px;color:var(--sub);margin-top:1px}
-.hbtns{margin-left:auto;display:flex;gap:6px}
-.hbtn{border:1px solid var(--line);background:var(--panel);color:var(--txt);border-radius:14px;
-  padding:6px 9px;font-size:11px;font-family:inherit;cursor:pointer;white-space:nowrap}
+header{padding:calc(env(safe-area-inset-top) + var(--s3)) var(--s3) var(--s3);
+  background:var(--panel);border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:var(--s2);z-index:5;position:relative}
+.brand{flex-shrink:0;min-width:0}
+/* ヘッダー上端の灯り(シグネチャーの常設版) */
+header:before{content:'';position:absolute;inset:0 0 auto;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,213,77,.55),transparent)}
+.logo{font-family:var(--disp);font-weight:900;font-size:var(--f-ts);color:var(--accent);letter-spacing:.5px;
+  display:flex;align-items:center;gap:var(--s1);white-space:nowrap}
+.logo .torch{font-size:var(--f-bd);line-height:1}
+.tagline{font-size:var(--f-cap);color:var(--sub);margin-top:2px}
+.hbtns{margin-left:auto;display:flex;gap:var(--s2)}
+.hbtn{border:1px solid var(--line);background:var(--panel2);color:var(--txt);border-radius:var(--r-s);
+  padding:var(--s2);font-size:var(--f-cap);white-space:nowrap;min-height:44px;line-height:1.2;
+  transition:background var(--mo),border-color var(--mo)}
+.hbtn:hover,.hbtn:active{background:var(--line);border-color:var(--accent)}
+
 /* ---- chat ---- */
-#chat{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
-.row{display:flex;gap:8px;align-items:flex-end;animation:pop .25s ease}
+#chat{flex:1;overflow-y:auto;padding:var(--s4) var(--s3) var(--s2);display:flex;flex-direction:column;gap:var(--s3);scroll-behavior:smooth}
+.row{display:flex;gap:var(--s2);align-items:flex-end;animation:pop 240ms cubic-bezier(.2,.7,.3,1)}
 @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .row.user{flex-direction:row-reverse}
-.avatar{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#2a325c,#161b30);
-  display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1px solid var(--line)}
-.bubble{max-width:82%;padding:10px 13px;border-radius:16px;font-size:13.5px;line-height:1.75;word-break:break-word;white-space:pre-wrap}
-.row.bot .bubble{background:var(--bot);border-bottom-left-radius:4px}
-.row.user .bubble{background:var(--user);color:#04240f;font-weight:500;border-bottom-right-radius:4px}
-.bname{font-size:10px;color:var(--sub);margin-bottom:3px}
-/* result cards inside bot bubble */
-.card{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:8px}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--panel2);
+  display:flex;align-items:center;justify-content:center;font-size:var(--f-ts);flex-shrink:0;border:1px solid var(--line)}
+.bubble{max-width:82%;padding:var(--s3) var(--s4);border-radius:var(--r-m);font-size:var(--f-bd);
+  line-height:1.75;word-break:break-word;white-space:pre-wrap}
+.row.bot .bubble{background:var(--panel2);border-bottom-left-radius:var(--s1)}
+.row.user .bubble{background:var(--user);color:var(--on-user);font-weight:500;border-bottom-right-radius:var(--s1)}
+.bname{font-size:var(--f-cap);color:var(--sub);margin-bottom:var(--s1)}
+
+/* ---- 判定結果カード ---- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s4);margin-top:var(--s3)}
 .card:first-child{margin-top:0}
-.lvl-emoji{font-size:30px}
-.lvl-name{font-family:'Zen Maru Gothic';font-weight:900;font-size:21px;margin:2px 0 4px}
-.lvl-3 .lvl-name{color:var(--yaba)} .lvl-2 .lvl-name{color:var(--warn)}
-.lvl-1 .lvl-name{color:var(--care)} .lvl-0 .lvl-name{color:var(--safe)}
-.meter{height:10px;background:#0b0e1c;border-radius:6px;overflow:hidden;margin:8px 0 4px}
-.meter i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#4dc9ff,#ffd54d,#ffb020,#ff4d5e);transition:width 1s ease}
-.score-note{font-size:11px;color:var(--sub)}
-.cat-chip{display:inline-block;background:#0b0e1c;border:1px solid var(--line);border-radius:12px;
-  padding:3px 10px;font-size:12px;margin:6px 4px 0 0}
-.flag{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;margin-top:7px}
+.card>b{font-size:var(--f-bs);display:block;margin-bottom:var(--s2)}
+/* シグネチャー「照らす」: 上から光が差してカードを照らし出す */
+.card.lit{position:relative;overflow:hidden}
+.card.lit:before{content:'';position:absolute;top:-60%;left:-10%;width:70%;height:220%;
+  background:linear-gradient(105deg,transparent,rgba(255,213,77,.16) 45%,transparent 70%);
+  transform:translateX(-120%);animation:sweep var(--reveal-dur) var(--reveal-ease) .05s 1 forwards;pointer-events:none}
+@keyframes sweep{to{transform:translateX(220%)}}
+.lvl-emoji{font-size:var(--f-dp);line-height:1;display:block}
+.lvl-name{font-family:var(--disp);font-weight:900;font-size:var(--f-tt);margin:var(--s2) 0 var(--s1)}
+.lvl-3 .lvl-name{color:var(--lv3)} .lvl-2 .lvl-name{color:var(--lv2)}
+.lvl-1 .lvl-name{color:var(--lv1)} .lvl-0 .lvl-name{color:var(--lv0)}
+/* 判定結果は画面の主役: 吹き出しの器を外して全幅に置く */
+.row.bot.wide{gap:0}
+.row.bot.wide>.avatar{display:none}
+.row.bot.wide>div{width:100%}
+.row.bot.wide .bname{margin-left:var(--s1)}
+.row.bot.wide .bubble{background:transparent;padding:0;max-width:100%;border-radius:0}
+.lvl-sub{font-size:var(--f-sm);color:var(--sub)}
+.meter{height:8px;background:var(--sunken);border-radius:var(--r-s);overflow:hidden;margin:var(--s3) 0 var(--s2);
+  border:1px solid var(--line)}
+.meter i{display:block;height:100%;border-radius:var(--r-s);transition:width 900ms cubic-bezier(.2,.8,.25,1)}
+.lvl-3 .meter i{background:linear-gradient(90deg,#FFD54D,var(--lv3))}
+.lvl-2 .meter i{background:linear-gradient(90deg,#FFD54D,var(--lv2))}
+.lvl-1 .meter i{background:var(--lv1)}
+.lvl-0 .meter i{background:var(--lv0)}
+.score-note{font-size:var(--f-sm);color:var(--sub)}
+.score-note b{color:var(--txt);font-family:var(--disp);font-size:var(--f-ts)}
+.flag{display:flex;gap:var(--s2);align-items:flex-start;font-size:var(--f-bs);margin-top:var(--s3);line-height:1.7}
 .flag b{color:var(--accent);font-weight:700}
-.flag .fx{flex-shrink:0}
-.stat{border-left:3px solid var(--accent);padding-left:10px;margin-top:8px;font-size:12.5px}
-.stat .num{font-family:'Zen Maru Gothic';font-weight:900;font-size:19px;color:var(--accent)}
-.src{font-size:10px;color:var(--sub);margin-top:6px}
-.alert-card{background:linear-gradient(135deg,#3a1220,#2a0e18);border:1px solid #ff4d5e;border-radius:14px;padding:13px;margin-top:8px}
-.alert-card h3{font-family:'Zen Maru Gothic';color:#ff8a94;font-size:15px;margin-bottom:6px}
-.alert-card p{font-size:12.5px;line-height:1.75}
-.btnrow{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
-.abtn{border:none;border-radius:14px;padding:9px 13px;font-size:12.5px;font-weight:700;font-family:inherit;cursor:pointer}
-.abtn.primary{background:var(--accent);color:#1a1400}
-.abtn.danger{background:var(--yaba);color:#fff}
+.flag .fx{flex-shrink:0;line-height:1.7}
+.stat{border-left:3px solid var(--accent);padding-left:var(--s3);margin-top:var(--s3);font-size:var(--f-bs);line-height:1.7}
+.stat .num{font-family:var(--disp);font-weight:900;font-size:var(--f-tt);color:var(--accent);display:inline-block}
+.src{font-size:var(--f-cap);color:var(--sub);margin-top:var(--s2);line-height:1.6}
+.alert-card{background:var(--panel);border:1px solid var(--lv3);border-left:4px solid var(--lv3);
+  border-radius:var(--r-m);padding:var(--s4);margin-top:var(--s3)}
+.alert-card h3{font-family:var(--disp);color:var(--lv3);font-size:var(--f-ts);margin-bottom:var(--s2)}
+.alert-card p{font-size:var(--f-bs);line-height:1.8}
+.btnrow{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4)}
+.abtn{border:none;border-radius:var(--r-m);padding:var(--s3) var(--s4);font-size:var(--f-bs);font-weight:700;
+  min-height:44px;transition:transform var(--mo),filter var(--mo)}
+.abtn:active{transform:scale(.97)}
+.abtn.primary{background:var(--accent);color:var(--on-accent)}
+.abtn.danger{background:var(--lv3);color:#fff}
 .abtn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+.abtn.ghost:hover{border-color:var(--accent)}
+
 /* typing */
-.dots{display:inline-flex;gap:4px;padding:4px 2px}
+.dots{display:inline-flex;gap:var(--s1);padding:var(--s1) 2px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--sub);animation:bl 1s infinite}
 .dots i:nth-child(2){animation-delay:.18s}.dots i:nth-child(3){animation-delay:.36s}
 @keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
+
 /* ---- samples + input ---- */
-#samples{display:flex;gap:7px;overflow-x:auto;padding:8px 12px;scrollbar-width:none}
+#samples{display:flex;gap:var(--s2);overflow-x:auto;padding:var(--s2) var(--s3);scrollbar-width:none}
 #samples::-webkit-scrollbar{display:none}
 .chip{flex-shrink:0;border:1px solid var(--line);background:var(--panel);color:var(--txt);
-  border-radius:16px;padding:8px 13px;font-size:12px;font-family:inherit;cursor:pointer}
-#inputbar{display:flex;gap:8px;padding:8px 12px calc(env(safe-area-inset-bottom) + 10px);
+  border-radius:var(--r-s);padding:var(--s2) var(--s3);font-size:var(--f-sm);min-height:44px;
+  transition:border-color var(--mo),background var(--mo)}
+.chip:hover,.chip:active{border-color:var(--accent);background:var(--panel2)}
+#inputbar{display:flex;gap:var(--s2);padding:var(--s3) var(--s3) calc(env(safe-area-inset-bottom) + var(--s3));
   background:var(--panel);border-top:1px solid var(--line);align-items:flex-end}
-#msg{flex:1;background:#0b0e1c;border:1px solid var(--line);border-radius:16px;color:var(--txt);
-  font-family:inherit;font-size:13.5px;line-height:1.6;padding:10px 13px;resize:none;max-height:110px;outline:none}
-#msg::placeholder{color:#5a6390}
-#send{width:44px;height:44px;border-radius:50%;border:none;background:var(--user);color:#fff;
-  font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-#send:disabled{opacity:.4}
+#msg{flex:1;background:var(--sunken);border:1px solid var(--line);border-radius:var(--r-m);color:var(--txt);
+  font-family:inherit;font-size:var(--f-bd);line-height:1.6;padding:var(--s3) var(--s4);resize:none;max-height:112px;outline:none;
+  transition:border-color var(--mo)}
+#msg:focus{border-color:var(--accent)}
+#msg::placeholder{color:var(--sub);opacity:.75}
+#send{width:44px;height:44px;border-radius:50%;border:none;background:var(--accent);color:var(--on-accent);
+  font-size:var(--f-ts);flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:transform var(--mo)}
+#send:active{transform:scale(.92)}
+
 /* ---- sheet ---- */
-.sheet-wrap{position:absolute;inset:0;background:rgba(4,6,15,.65);backdrop-filter:blur(2px);
+.sheet-wrap{position:absolute;inset:0;background:rgba(6,9,17,.72);backdrop-filter:blur(3px);
   display:none;align-items:flex-end;z-index:20}
 .sheet-wrap.on{display:flex}
-.sheet{width:100%;background:var(--panel);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px);
-  max-height:78%;overflow-y:auto;animation:up .25s ease}
+.sheet{width:100%;background:var(--panel);border-radius:var(--r-l) var(--r-l) 0 0;
+  padding:var(--s5) var(--s4) calc(env(safe-area-inset-bottom) + var(--s5));
+  max-height:82%;overflow-y:auto;animation:up 260ms cubic-bezier(.2,.8,.25,1);border-top:1px solid var(--line)}
 @keyframes up{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
-.sheet h2{font-family:'Zen Maru Gothic';font-size:16px;margin-bottom:4px}
-.sheet .note{font-size:11px;color:var(--sub);margin-bottom:12px}
-.contact{display:flex;align-items:center;gap:11px;background:var(--panel2);border:1px solid var(--line);
-  border-radius:14px;padding:12px;margin-bottom:9px;text-decoration:none;color:var(--txt)}
-.contact .ic{font-size:22px}
-.contact .t1{font-size:13.5px;font-weight:700}
-.contact .t2{font-size:11px;color:var(--sub);margin-top:2px}
-.contact .tel{margin-left:auto;font-family:'Zen Maru Gothic';font-weight:900;color:var(--accent);font-size:15px;flex-shrink:0}
-.srcitem{font-size:11.5px;line-height:1.7;color:var(--sub);margin-bottom:9px;padding-left:10px;border-left:2px solid var(--line)}
+.sheet h2{font-family:var(--disp);font-size:var(--f-ts);margin-bottom:var(--s1)}
+.sheet .note{font-size:var(--f-sm);color:var(--sub);margin-bottom:var(--s4);line-height:1.7}
+.contact{display:flex;align-items:center;gap:var(--s3);background:var(--panel2);border:1px solid var(--line);
+  border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s2);text-decoration:none;color:var(--txt);
+  min-height:44px;transition:border-color var(--mo)}
+.contact:hover{border-color:var(--accent)}
+.contact .ic{font-size:var(--f-tt);line-height:1}
+.contact .t1{font-size:var(--f-bd);font-weight:700}
+.contact .t2{font-size:var(--f-sm);color:var(--sub);margin-top:2px;line-height:1.5}
+.contact .tel{margin-left:auto;font-family:var(--disp);font-weight:900;color:var(--accent);font-size:var(--f-ts);flex-shrink:0}
+.srcitem{font-size:var(--f-sm);line-height:1.75;color:var(--sub);margin-bottom:var(--s3);
+  padding-left:var(--s3);border-left:2px solid var(--line)}
 .srcitem b{color:var(--txt)}
-select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--line);border-radius:12px;
-  padding:11px;font-family:inherit;font-size:14px;margin-bottom:10px}
-.close-x{margin-left:auto;background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer}
-.sheet-head{display:flex;align-items:center}
+select{width:100%;background:var(--sunken);color:var(--txt);border:1px solid var(--line);border-radius:var(--r-m);
+  padding:var(--s3) var(--s4);font-family:inherit;font-size:var(--f-bd);margin-bottom:var(--s3);min-height:44px}
+.close-x{margin-left:auto;background:none;border:none;color:var(--sub);font-size:var(--f-tt);
+  width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.sheet-head{display:flex;align-items:center;margin-bottom:var(--s1)}
+
 /* ---- manga ---- */
-.mg-head{background:linear-gradient(135deg,#2a2050,#1a1f3d);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:12px}
-.mg-date{font-size:11px;color:var(--accent);font-weight:700}
-.mg-title{font-family:'Zen Maru Gothic';font-weight:900;font-size:19px;margin-top:3px;line-height:1.35}
-.mg-tag{display:inline-block;background:#0b0e1c;border:1px solid var(--line);border-radius:11px;padding:2px 9px;font-size:11px;color:var(--sub);margin-top:6px}
-.mpanel{border:2px solid #38406e;border-radius:12px;overflow:hidden;margin-bottom:10px;background:#0b0e1c}
-.mnarr{font-size:11.5px;line-height:1.6;color:var(--txt);background:#161b30;padding:7px 11px;border-bottom:1px solid #38406e}
-.mstage{position:relative;min-height:118px;display:flex;align-items:center;gap:10px;padding:13px 12px}
-.mchar{font-size:44px;flex-shrink:0;line-height:1;filter:drop-shadow(0 2px 5px rgba(0,0,0,.5))}
-.mbubble{position:relative;background:#f3f5ff;color:#14182b;border-radius:13px;padding:9px 12px;font-size:12.5px;
-  line-height:1.6;font-weight:500;flex:1}
-.mbubble:after{content:'';position:absolute;left:-7px;top:20px;border:7px solid transparent;border-right-color:#f3f5ff;border-left:0}
-.mbubble.think{background:#e6e9f8;border-radius:16px}
-.mno{position:absolute;right:7px;top:5px;font-size:10px;color:rgba(255,255,255,.4);font-weight:700}
-.mg-foot{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:12px;margin-top:2px}
-.mg-foot .fl{font-size:12.5px;line-height:1.8}
-.mg-nav{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.mg-head{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--accent);
+  border-radius:var(--r-m);padding:var(--s4);margin-bottom:var(--s4)}
+.mg-date{font-size:var(--f-cap);color:var(--accent);font-weight:700}
+.mg-title{font-family:var(--disp);font-weight:900;font-size:var(--f-tt);margin-top:var(--s1);line-height:1.4}
+.mg-tag{display:inline-block;background:var(--sunken);border:1px solid var(--line);border-radius:var(--r-s);
+  padding:var(--s1) var(--s2);font-size:var(--f-cap);color:var(--sub);margin-top:var(--s2)}
+.mpanel{border:1px solid var(--line);border-radius:var(--r-m);overflow:hidden;margin-bottom:var(--s3);background:var(--sunken)}
+.mnarr{font-size:var(--f-sm);line-height:1.6;color:var(--txt);background:var(--panel);
+  padding:var(--s2) var(--s3);border-bottom:1px solid var(--line)}
+.mstage{position:relative;min-height:112px;display:flex;align-items:center;gap:var(--s3);padding:var(--s4) var(--s3)}
+/* 4コマの温度: パレット内の色を薄く敷いて緊張を上げる */
+.mstage.heat0,.mstage.heat1{background:var(--sunken)}
+.mstage.heat2{background:linear-gradient(180deg,var(--sunken),rgba(255,159,28,.09))}
+.mstage.heat3{background:linear-gradient(180deg,var(--sunken),rgba(255,77,94,.13))}
+.mchar{font-size:var(--f-hero);flex-shrink:0;line-height:1}
+.mbubble{position:relative;background:#F4F6FF;color:#141A2B;border-radius:var(--r-m);padding:var(--s3);
+  font-size:var(--f-bs);line-height:1.65;font-weight:500;flex:1;min-width:0}
+.mbubble:after{content:'';position:absolute;left:-7px;top:20px;border:7px solid transparent;border-right-color:#F4F6FF;border-left:0}
+.mbubble.think{background:#E7EAF7}
+.mno{position:absolute;right:var(--s2);top:var(--s2);font-size:var(--f-cap);color:var(--sub);font-weight:700}
+.mg-foot{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r-m);padding:var(--s4);margin-top:var(--s1)}
+.mg-foot .fl{font-size:var(--f-bs);line-height:1.8}
+.mg-nav{display:flex;gap:var(--s2);margin-top:var(--s4);flex-wrap:wrap}
+
+
+/* 判定結果は画面の主役: 吹き出しの器を外して全幅に置く */
+.row.bot.wide{gap:0}
+.row.bot.wide>.avatar{display:none}
+.row.bot.wide>div{width:100%}
+.row.bot.wide .bname{margin-left:var(--s1)}
+.row.bot.wide .bubble{background:transparent;padding:0;max-width:100%;border-radius:0}
+.lvl-sub{font-size:var(--f-sm);color:var(--sub)}
+.stat .unit{font-size:var(--f-sm);color:var(--accent);font-weight:700}
+.stat.machi{border-left-color:var(--lv0)}
+.stat.machi .num,.stat.machi .unit{color:var(--lv0)}
+.card .body{font-size:var(--f-bs);line-height:1.8;margin-top:var(--s2)}
+.card .body.sub{color:var(--sub)}
+.abtn.full{width:100%;justify-content:center}
+.note.disclaimer{margin-top:var(--s3);margin-bottom:var(--s3)}
+.mg-invite{margin-bottom:var(--s3)}
+.mg-invite b{color:var(--accent)}
+
+/* ---- reduced motion: 光の走査とメーターを止め、最終状態を即出す ---- */
+@media (prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important}
+  .card.lit:before{display:none}
+}
 </style>
 </head>
 <body>
 <div id="app">
   <header>
-    <div>
+    <div class="brand">
       <div class="logo"><span class="torch">🔦</span> ヤミバレ</div>
       <div class="tagline">届いたら、貼るだけ。</div>
     </div>
@@ -161,8 +258,8 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
       <a class="contact" href="tel:%239110"><span class="ic">👮</span><span><span class="t1">警察相談専用電話</span><div class="t2">詐欺かも?闇バイトに応募したかも…全部OK</div></span><span class="tel">#9110</span></a>
       <a class="contact" href="tel:0335804970"><span class="ic">🧑‍🎓</span><span><span class="t1">ヤング・テレホン・コーナー</span><div class="t2">警視庁の少年相談窓口(本人・家族OK)</div></span><span class="tel">03-3580-4970</span></a>
       <a class="contact" href="tel:188"><span class="ic">🛒</span><span><span class="t1">消費者ホットライン</span><div class="t2">買い物・投資・サブスクのトラブル</div></span><span class="tel">188</span></a>
-      <div class="note" style="margin-top:8px">※ヤミバレは公的機関のサービスではありません。判定は目安です。迷ったら必ず相談を。</div>
-      <button class="abtn ghost" style="width:100%" onclick="openSheet('src')">📚 データの出典を見る</button>
+      <div class="note disclaimer">※ヤミバレは公的機関のサービスではありません。判定は目安です。迷ったら必ず相談を。</div>
+      <button class="abtn ghost full" onclick="openSheet('src')">📚 データの出典を見る</button>
     </div>
   </div>
 
@@ -172,7 +269,7 @@ select{width:100%;background:#0b0e1c;color:var(--txt);border:1px solid var(--lin
       <div class="sheet-head"><h2>📍 わがまちの詐欺データ</h2><button class="close-x" onclick="closeSheets()">✕</button></div>
       <div class="note">警視庁オープンデータ(令和7年・区市町村の町丁別/手口別認知件数)から、あなたの街の「詐欺」認知件数を表示します。</div>
       <select id="machi-select"><option value="">区市町村を選ぶ</option></select>
-      <button class="abtn primary" style="width:100%" onclick="showMachi()">この街のデータを見る</button>
+      <button class="abtn primary full" onclick="showMachi()">この街のデータを見る</button>
     </div>
   </div>
 
@@ -414,8 +511,8 @@ function addUser(text){
   chat.appendChild(el(`<div class="row user"><div class="bubble">${esc(text)}</div></div>`));
   scrollBottom();
 }
-function addBot(inner,{raw=false}={}){
-  const b=el(`<div class="row bot"><div class="avatar">🔦</div><div><div class="bname">ヤミバレAI</div><div class="bubble"></div></div></div>`);
+function addBot(inner,{raw=false,wide=false}={}){
+  const b=el(`<div class="row bot${wide?' wide':''}"><div class="avatar">🔦</div><div><div class="bname">ヤミバレAI</div><div class="bubble"></div></div></div>`);
   const bub=b.querySelector('.bubble');
   if(raw){bub.innerHTML=inner;bub.style.whiteSpace='normal';} else bub.textContent=inner;
   chat.appendChild(b);scrollBottom();return bub;
@@ -441,33 +538,33 @@ function showResult(text){
   const meta=LVL_META[r.lvl];
   const catName=r.cat==='none'?'特定の型には未分類':`${CATS[r.cat].icon} ${CATS[r.cat].name}の疑い`;
   /* レベルカード */
-  let html=`<div class="card lvl-${r.lvl}">
+  let html=`<div class="card lit lvl-${r.lvl}">
     <span class="lvl-emoji">${meta.emoji}</span>
     <div class="lvl-name">${meta.name}</div>
-    <div style="font-size:12px;color:var(--sub)">${meta.note}</div>
+    <div class="lvl-sub">${meta.note}</div>
     <div class="meter"><i style="width:0%" data-w="${r.score}%"></i></div>
-    <div class="score-note">ヤバ度 <b style="color:var(--txt)">${r.score}</b> /100 ・ ${catName}</div>
+    <div class="score-note">ヤバ度 <b>${r.score}</b> /100 ・ ${catName}</div>
   </div>`;
   /* 危険サイン */
   if(r.flags.length||r.generic.length){
-    html+=`<div class="card"><b style="font-size:13px">🚩 見つけた危険サイン</b>`;
+    html+=`<div class="card"><b>🚩 見つけた危険サイン</b>`;
     for(const f of r.flags) html+=`<div class="flag"><span class="fx">⚠️</span><span><b>「${esc(f.hit)}」</b> — ${esc(f.label)}</span></div>`;
     for(const g of r.generic) html+=`<div class="flag"><span class="fx"></span><span>${esc(g.label)}: <b>「${esc(g.hit)}」</b></span></div>`;
     html+=`</div>`;
   }
   /* オープンデータ根拠 */
   const st=STATS[r.cat]||STATS.none;
-  html+=`<div class="card"><b style="font-size:13px">📊 データが語る現実</b>
-    <div class="stat"><span class="num">${st.num}</span><span style="font-size:12px">${st.unit}</span><br>${st.desc}</div>`;
-  if(myMachi) html+=`<div class="stat" style="border-color:#4dc9ff"><span class="num" style="color:#4dc9ff">${myMachi.s.toLocaleString()}</span><span style="font-size:12px">件</span><br>${myMachi.n}の詐欺認知件数(令和7年)。多い町丁: ${myMachi.t.map(t=>t[0]).join('、')}</div>`;
+  html+=`<div class="card"><b>📊 データが語る現実</b>
+    <div class="stat"><span class="num">${st.num}</span><span class="unit">${st.unit}</span><br>${st.desc}</div>`;
+  if(myMachi) html+=`<div class="stat machi"><span class="num">${myMachi.s.toLocaleString()}</span><span class="unit">件</span><br>${myMachi.n}の詐欺認知件数(令和7年)。多い町丁: ${myMachi.t.map(t=>t[0]).join('、')}</div>`;
   html+=`<div class="src">出典: ${st.src}(実データ)</div></div>`;
   /* アドバイス */
-  html+=`<div class="card"><b style="font-size:13px">🧭 どうすればいい?</b><div style="font-size:12.5px;margin-top:6px;line-height:1.8">${ADVICE[r.cat]||ADVICE.none}</div>
+  html+=`<div class="card"><b>🧭 どうすればいい?</b><div class="body">${ADVICE[r.cat]||ADVICE.none}</div>
     <div class="btnrow">
       <button class="abtn primary" onclick="openSheet('sos')">🆘 相談先を見る</button>
       <button class="abtn ghost" onclick="shareCard()">📸 結果カードを保存</button>
     </div></div>`;
-  addBot(html,{raw:true});
+  addBot(html,{raw:true,wide:true});
   /* 闇バイト特別警告 */
   if(r.cat==='yamibaito'){
     addBot(`<div class="alert-card"><h3>⚠️ それ、闇バイトの入口です</h3>
@@ -476,7 +573,7 @@ function showResult(text){
     <div class="btnrow">
       <button class="abtn danger" onclick="location.href='tel:%239110'">📞 #9110 に電話</button>
       <button class="abtn ghost" onclick="openSheet('sos')">他の相談先</button>
-    </div></div>`,{raw:true});
+    </div></div>`,{raw:true,wide:true});
   }
   /* メーターアニメ */
   requestAnimationFrame(()=>{document.querySelectorAll('.meter i').forEach(m=>m.style.width=m.dataset.w)});
@@ -506,11 +603,11 @@ function showMachi(){
   const w=WAGAMACHI.find(x=>x.n===sel.value);
   if(!w)return;
   myMachi=w;closeSheets();
-  addBot(`<div class="card"><b style="font-size:13px">📍 ${w.n}のリアル</b>
-  <div class="stat"><span class="num">${w.s.toLocaleString()}</span><span style="font-size:12px">件</span><br>${w.n}の刑法犯「詐欺」認知件数(令和7年)。</div>
-  <div style="font-size:12.5px;margin-top:8px">とくに多い町丁:<br>${w.t.map((t,i)=>`${['🥇','🥈','🥉'][i]} ${t[0]} <b>${t[1]}件</b>`).join('<br>')}</div>
+  addBot(`<div class="card"><b>📍 ${w.n}のリアル</b>
+  <div class="stat"><span class="num">${w.s.toLocaleString()}</span><span class="unit">件</span><br>${w.n}の刑法犯「詐欺」認知件数(令和7年)。</div>
+  <div class="body">とくに多い町丁:<br>${w.t.map((t,i)=>`${['🥇','🥈','🥉'][i]} ${t[0]} <b>${t[1]}件</b>`).join('<br>')}</div>
   <div class="src">出典: 警視庁「区市町村の町丁別、手口別認知件数(令和7年)」</div></div>
-  <div style="font-size:12px;margin-top:8px">これ以降の判定に、${w.n}のデータも表示するね。</div>`,{raw:true});
+  <div class="body sub">これ以降の判定に、${w.n}のデータも表示するね。</div>`,{raw:true,wide:true});
 }
 
 /* ================= シェアカード ================= */
@@ -547,45 +644,45 @@ function shareCard(){
 const MANGA=[
  {key:'yamibaito',title:'「運ぶだけ」の一本道',tag:'🕳️ 闇バイト',demo:0,
   panels:[
-   {n:'深夜のSNS。流れてきた1件の募集',c:'🧑‍🎓',s:'今月、マジで金ないな…',bg:'#141a33',think:1},
-   {n:'面接なし・年齢不問・即日払い',c:'📱',s:'日給5万円!荷物を受け取って運ぶだけの簡単ホワイト案件です',bg:'#1a2140'},
-   {n:'送った瞬間、家族の住所まで相手の手に',c:'🪪',s:'身分証だけ送ってね。あとの連絡はTelegramで',bg:'#241a33'},
-   {n:'捕まるのは運んだ本人だけ。指示役は顔も名前も知らない',c:'🚓',s:'「話が違う」は、通らない。',bg:'#2a1420'}],
+   {n:'深夜のSNS。流れてきた1件の募集',c:'🧑‍🎓',s:'今月、マジで金ないな…',think:1},
+   {n:'面接なし・年齢不問・即日払い',c:'📱',s:'日給5万円!荷物を受け取って運ぶだけの簡単ホワイト案件です'},
+   {n:'送った瞬間、家族の住所まで相手の手に',c:'🪪',s:'身分証だけ送ってね。あとの連絡はTelegramで'},
+   {n:'捕まるのは運んだ本人だけ。指示役は顔も名前も知らない',c:'🚓',s:'「話が違う」は、通らない。'}],
   end:'でも、もう応募していても戻れます。警察は約1年で544人を保護しました。'},
  {key:'police',title:'電話の向こうの「警察官」',tag:'👮 ニセ警察',demo:1,
   panels:[
-   {n:'昼下がり、知らない番号から着信',c:'📞',s:'警視庁の者です。あなたの口座が事件に使われています',bg:'#141a33'},
-   {n:'画面には警察手帳らしきものが映る',c:'👮',s:'今からLINEのビデオ通話で取り調べを行います',bg:'#1a2140'},
-   {n:'「家族にも言わないでください」',c:'💸',s:'保釈保証金を今日中に振り込めば、逮捕は保留にできます',bg:'#241a33'},
-   {n:'本物の警察はLINEで取り調べもしないし、お金も要求しない',c:'❗',s:'全部、ニセモノ。',bg:'#2a1420'}],
+   {n:'昼下がり、知らない番号から着信',c:'📞',s:'警視庁の者です。あなたの口座が事件に使われています'},
+   {n:'画面には警察手帳らしきものが映る',c:'👮',s:'今からLINEのビデオ通話で取り調べを行います'},
+   {n:'「家族にも言わないでください」',c:'💸',s:'保釈保証金を今日中に振り込めば、逮捕は保留にできます'},
+   {n:'本物の警察はLINEで取り調べもしないし、お金も要求しない',c:'❗',s:'全部、ニセモノ。'}],
   end:'ニセ警察詐欺の被害は30代が最多(2,239件)。若い世代ほど狙われています。'},
  {key:'adfraud',title:'AIがつくった「あの有名人」',tag:'🎭 なりすまし広告',demo:5,
   panels:[
-   {n:'YouTubeの広告に、見覚えのある実業家',c:'📱',s:'本人が語る、資産形成のメソッド',bg:'#141a33'},
-   {n:'声も顔も本人そっくり。でも、AIの合成',c:'🎭',s:'私が直接、無料で教えます',bg:'#1a2140'},
-   {n:'広告から出た時点で、相手の土俵',c:'💬',s:'まずは公式LINEに友だち追加してください',bg:'#241a33'},
-   {n:'SNS型投資詐欺の入口はYouTubeが27.1%。国も8月7日、5社に対策を要請した',c:'📊',s:'本人は、投資を勧めていない。',bg:'#2a1420'}],
+   {n:'YouTubeの広告に、見覚えのある実業家',c:'📱',s:'本人が語る、資産形成のメソッド'},
+   {n:'声も顔も本人そっくり。でも、AIの合成',c:'🎭',s:'私が直接、無料で教えます'},
+   {n:'広告から出た時点で、相手の土俵',c:'💬',s:'まずは公式LINEに友だち追加してください'},
+   {n:'SNS型投資詐欺の入口はYouTubeが27.1%。国も8月7日、5社に対策を要請した',c:'📊',s:'本人は、投資を勧めていない。'}],
   end:'気になったら、広告のリンクではなく公式サイトを自分で検索して確かめて。'},
  {key:'invest',title:'「先生」の限定グループ',tag:'📈 SNS型投資詐欺',demo:2,
   panels:[
-   {n:'知らないアカウントからのDM',c:'💬',s:'先生の限定グループに、あなたを特別にご招待します✨',bg:'#141a33'},
-   {n:'グループでは毎日「儲かった」報告が並ぶ',c:'📈',s:'月利30%、元本保証。絶対に損はしません',bg:'#1a2140'},
-   {n:'10万円が、画面の上では50万円に',c:'💰',s:'増えていくのは、数字だけ。',bg:'#241a33'},
-   {n:'手数料を払っても、出金はできない',c:'🚪',s:'出金には手数料が必要です',bg:'#2a1420'}],
+   {n:'知らないアカウントからのDM',c:'💬',s:'先生の限定グループに、あなたを特別にご招待します✨'},
+   {n:'グループでは毎日「儲かった」報告が並ぶ',c:'📈',s:'月利30%、元本保証。絶対に損はしません'},
+   {n:'10万円が、画面の上では50万円に',c:'💰',s:'増えていくのは、数字だけ。'},
+   {n:'手数料を払っても、出金はできない',c:'🚪',s:'出金には手数料が必要です'}],
   end:'「元本保証」は投資では法律的にありえない勧誘。入金前に金融庁の登録業者か確認を。'},
  {key:'romance',title:'会えない恋人',tag:'💔 ロマンス詐欺',demo:3,
   panels:[
-   {n:'マッチングアプリで知り合って2週間',c:'💘',s:'あなたと話すのが、毎日の楽しみなんだ',bg:'#141a33'},
-   {n:'写真はいつも同じ角度。顔は一度も見ていない',c:'🌏',s:'海外赴任中で、ビデオ通話はできなくて…',bg:'#1a2140'},
-   {n:'はじめての、お金の話',c:'💵',s:'叔父の取引所なら必ず増える。二人の将来のために',bg:'#241a33'},
-   {n:'送金した先に、その人はいない',c:'🕳️',s:'会えない相手のお金の話は、ほぼ詐欺。',bg:'#2a1420'}],
+   {n:'マッチングアプリで知り合って2週間',c:'💘',s:'あなたと話すのが、毎日の楽しみなんだ'},
+   {n:'写真はいつも同じ角度。顔は一度も見ていない',c:'🌏',s:'海外赴任中で、ビデオ通話はできなくて…'},
+   {n:'はじめての、お金の話',c:'💵',s:'叔父の取引所なら必ず増える。二人の将来のために'},
+   {n:'送金した先に、その人はいない',c:'🕳️',s:'会えない相手のお金の話は、ほぼ詐欺。'}],
   end:'プロフィール画像を画像検索すると、使い回しが見つかることもあります。'},
  {key:'phishing',title:'不在通知のURL',tag:'📦 フィッシング',demo:4,
   panels:[
-   {n:'心当たりはある。通販を頼んでいた',c:'📦',s:'お荷物のお届けにあがりましたが、不在のため持ち帰りました',bg:'#141a33'},
-   {n:'URLの末尾が .top。公式のドメインとは違う',c:'🔗',s:'本日中にご確認ください',bg:'#1a2140'},
-   {n:'入力したIDとパスワードは、そのまま相手の手元へ',c:'🔑',s:'本人確認のため、ログインしてください',bg:'#241a33'},
-   {n:'気づいたときには、カードが使われている',c:'💳',s:'荷物の確認は、公式アプリから。',bg:'#2a1420'}],
+   {n:'心当たりはある。通販を頼んでいた',c:'📦',s:'お荷物のお届けにあがりましたが、不在のため持ち帰りました'},
+   {n:'URLの末尾が .top。公式のドメインとは違う',c:'🔗',s:'本日中にご確認ください'},
+   {n:'入力したIDとパスワードは、そのまま相手の手元へ',c:'🔑',s:'本人確認のため、ログインしてください'},
+   {n:'気づいたときには、カードが使われている',c:'💳',s:'荷物の確認は、公式アプリから。'}],
   end:'SMSのURLは開かない。ブックマークした公式サイトから確認するのが確実です。'}
 ];
 function todayIdx(){const d=new Date();return (d.getFullYear()*372+d.getMonth()*31+d.getDate())%MANGA.length}
@@ -597,7 +694,7 @@ function renderManga(){
     <div class="mg-title">${m.title}</div><span class="mg-tag">${m.tag}</span></div>`;
   m.panels.forEach((p,i)=>{
     h+=`<div class="mpanel"><div class="mnarr">${esc(p.n)}</div>
-      <div class="mstage" style="background:${p.bg}"><span class="mno">${i+1}</span>
+      <div class="mstage heat${i}"><span class="mno">${i+1}</span>
       <span class="mchar">${p.c}</span><span class="mbubble${p.think?' think':''}">${esc(p.s)}</span></div></div>`;
   });
   h+=`<div class="mg-foot"><div class="fl">🔦 ${esc(m.end)}</div>
@@ -621,17 +718,20 @@ const ta=document.getElementById('msg');
 ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.min(110,ta.scrollHeight)+'px'});
 ta.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey))submitMsg()});
 
-const IS_DEMO=new URLSearchParams(location.search).has('demo');
+const QP=new URLSearchParams(location.search);
+const IS_DEMO=QP.has('demo');
+const INSTANT=QP.has('instant');   // 撮影用: 挿入の間を置かず一度に描画する
 addBot('やっほー、ヤミバレAIだよ🔦\n怪しいDM・バイト募集・儲け話が届いたら、そのままここに貼って!\n危険サインとオープンデータで「ヤバさ」を照らすよ。');
 if(!IS_DEMO){
-  setTimeout(()=>addBot('まずは下のサンプルを押してみて👇\n(あなたが貼った内容はこの端末の中だけで判定。どこにも送信しないよ)'),600);
-  setTimeout(()=>addBot(`<div style="margin-bottom:8px">📰 今日の手口マンガも届いてるよ。<br><b style="color:var(--accent)">${MANGA[todayIdx()].title}</b></div>
-    <button class="abtn primary" onclick="openManga()">4コマで読む</button>`,{raw:true}),1200);
+  const m2=()=>addBot('まずは下のサンプルを押してみて👇\n(あなたが貼った内容はこの端末の中だけで判定。どこにも送信しないよ)');
+  const m3=()=>addBot(`<div class="mg-invite">📰 今日の手口マンガも届いてるよ。<br><b>${MANGA[todayIdx()].title}</b></div>
+    <button class="abtn primary" onclick="openManga()">4コマで読む</button>`,{raw:true});
+  if(INSTANT){m2();m3();} else {setTimeout(m2,500);setTimeout(m3,1000);}
 }
 
 /* ================= デモモード(?demo=) — スクショ・動画撮影用 ================= */
 (function(){
-  const qp=new URLSearchParams(location.search);
+  const qp=QP;
   const demo=qp.get('demo');
   if(!demo)return;
   const MAP={yamibaito:0,police:1,invest:2,romance:3,sms:4,adfraud:5};

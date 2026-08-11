@@ -22,7 +22,7 @@ iframe{width:${cw}px;height:${ch}px;border:0;transform:scale($sc);transform-orig
 </style></head><body><iframe src="$url"></iframe></body></html>
 HTML
   "$CHROME" --headless=new --disable-gpu --hide-scrollbars \
-    --window-size="$pw","$ph" --virtual-time-budget=9000 \
+    --window-size="$pw","$ph" --virtual-time-budget=20000 \
     --screenshot="$out" "file://$abs" 2>/dev/null
   rm -f "$tmp"
 }
@@ -30,6 +30,6 @@ HTML
 # capture_page <出力png> <URL|file://> <幅> <高>  (等倍・そのまま撮影)
 capture_page () {
   "$CHROME" --headless=new --disable-gpu --hide-scrollbars \
-    --window-size="$3","$4" --virtual-time-budget=9000 \
+    --window-size="$3","$4" --virtual-time-budget=20000 \
     --screenshot="$1" "$2" 2>/dev/null
 }
